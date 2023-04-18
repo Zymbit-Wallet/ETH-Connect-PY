@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 class ZymbitKeyringInterface(ABC):
     type: str
+    path: str
 
     def __init__(self, options: dict = {}) -> None:
         self.deserialize(options)
@@ -11,7 +12,7 @@ class ZymbitKeyringInterface(ABC):
         pass
 
     @abstractmethod
-    def deserialize(self, options: dict = {}) -> bool:
+    def deserialize(self, options: dict = {}) -> None:
         pass
 
     @abstractmethod

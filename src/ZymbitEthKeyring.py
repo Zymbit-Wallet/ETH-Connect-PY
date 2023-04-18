@@ -1,15 +1,7 @@
 from ZymbitKeyringInterface import ZymbitKeyringInterface
+from EthAccount import EthAccount
 import zymkey
 from web3 import Web3
-
-class EthAccount():
-    def __init__(self, path: str, address: str, slot: int) -> None:
-        self.path = path
-        self.address = address
-        self.slot = slot
-
-    def __repr__(self) -> str:
-        return f"Path: {self.path}, Address: {self.address}, Slot: {self.slot}"
 
 class ZymbitEthKeyring(ZymbitKeyringInterface):
     type: str = "ETH"
@@ -99,7 +91,15 @@ class ZymbitEthKeyring(ZymbitKeyringInterface):
         return self.accounts
 
     def removeAccount(self, address: str = None, slot: int = None, path: int = None) -> bool:
-        return super().removeAccount(address, slot, path)    
+        if(slot is None and address is None and path is None):
+            raise ValueError("Valid address, slot, or path required")
+        for account in self.accounts:
+            if(account.address == address or account.slot == slot or account.path == path):
+                zymkey.client.remove_key(account.slot)
+                self.accounts.remove(account)
+                return True
+        return False
+                    
 
     def _generateBasePathKey(self, deepestPath) -> int:
         slot = 0

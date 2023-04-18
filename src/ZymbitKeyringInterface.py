@@ -16,7 +16,7 @@ class ZymbitKeyringInterface(ABC):
         pass
 
     @abstractmethod
-    def addAccounts(self, n: int = 1) -> list[str]:
+    def addAccounts(self, n: int = 1) -> list[dict]:
         pass
 
     @abstractmethod

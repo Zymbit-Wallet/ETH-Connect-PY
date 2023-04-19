@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 class ZymbitKeyringInterface(ABC):
     type: str
-    path: str
+    basePath: str
 
     def __init__(self, options: dict = {}) -> None:
         self.deserialize(options)

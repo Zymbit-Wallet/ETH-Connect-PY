@@ -5,7 +5,7 @@ from web3 import Web3
 
 class ZymbitEthKeyring(ZymbitKeyringInterface):
     type: str = "ETH"
-    path: str = "m/44'/60'/0'/0"
+    basePath: str = "m/44'/60'/0'/0"
 
     def __init__(self, options: dict = {}) -> None:
         super().__init__(options)
@@ -13,7 +13,11 @@ class ZymbitEthKeyring(ZymbitKeyringInterface):
     def serialize(self) -> dict:
         serializedKeyring = {
             "walletName": self.walletName,
-            "masterSlot": self.masterSlot
+            "masterSlot": self.masterSlot,
+            "type": self.type,
+            "basePath": self.basePath,
+            "baseSlot": self.baseSlot,
+            "accounts": [account.serialize() for account in self.accounts],
         }
         return serializedKeyring
 
@@ -48,11 +52,11 @@ class ZymbitEthKeyring(ZymbitKeyringInterface):
         for slot in slots:
             (path, walletName, masterSlot) = zymkey.client.get_wallet_node_addr(slot)
             if (walletName == self.walletName):
-                if (path == self.path):
+                if (path == self.basePath):
                     self.baseSlot = slot
-                elif ((self.path + "/") in path and masterSlot == self.masterSlot):
+                elif ((self.basePath + "/") in path and masterSlot == self.masterSlot):
                     self.accounts.append(EthAccount(path, self._generateEthAddress(slot), slot))
-                elif (path in self.path and len(path) > len(deepestPath["path"])):
+                elif (path in self.basePath and len(path) > len(deepestPath["path"])):
                     deepestPath = {"path": path, "slot": slot}
         
         if(self.baseSlot == 0):
@@ -68,7 +72,7 @@ class ZymbitEthKeyring(ZymbitKeyringInterface):
         for i in range(n):
             newAccountIndex = self._findNextAccountIndex()
             slot = zymkey.client.gen_wallet_child_key(self.baseSlot, newAccountIndex, False)
-            newAccount = EthAccount(self.path + "/" + str(newAccountIndex), self._generateEthAddress(slot), slot)
+            newAccount = EthAccount(self.basePath + "/" + str(newAccountIndex), self._generateEthAddress(slot), slot)
             newAccounts.append(newAccount)
             self.accounts.append(newAccount)
         
@@ -79,11 +83,11 @@ class ZymbitEthKeyring(ZymbitKeyringInterface):
             raise ValueError("Invalid Index")
 
         for account in self.accounts:
-            if(account.path == self.path + "/" + str(index)):
+            if(account.path == self.basePath + "/" + str(index)):
                 raise ValueError("Account already exists in keyring")
         
         slot = zymkey.client.gen_wallet_child_key(self.baseSlot, index, False)
-        newAccount = EthAccount(self.path + "/" + str(index), self._generateEthAddress(slot), slot)
+        newAccount = EthAccount(self.basePath + "/" + str(index), self._generateEthAddress(slot), slot)
         self.accounts.append(newAccount)
         return newAccount
     
@@ -118,7 +122,7 @@ class ZymbitEthKeyring(ZymbitKeyringInterface):
             slot = zymkey.client.gen_wallet_child_key(deepestPath["slot"], 0, True)
         elif deepestPath["path"] == "m/44'/60'/0'":
             slot = zymkey.client.gen_wallet_child_key(deepestPath["slot"], 0, False)
-        elif deepestPath["path"] == self.path:
+        elif deepestPath["path"] == self.basePath:
             return deepestPath["slot"]
         (path, walletName, masterSlot) = zymkey.client.get_wallet_node_addr(slot)
         return self._generateBasePathKey({"path": path, "slot": slot})
@@ -126,7 +130,7 @@ class ZymbitEthKeyring(ZymbitKeyringInterface):
     def _findNextAccountIndex(self) -> int:
         nextAccountIndex = 0
         for account in self.accounts:
-            if (int(account.path[len(self.path + "/"):]) == nextAccountIndex):
+            if (int(account.path[len(self.basePath + "/"):]) == nextAccountIndex):
                 nextAccountIndex += 1
         return nextAccountIndex
     
@@ -136,4 +140,4 @@ class ZymbitEthKeyring(ZymbitKeyringInterface):
         return Web3.toChecksumAddress(keccakHash[-40:])
     
     def __repr__(self) -> str:
-        return f"ZymbitEthKeyring(type={self.type}, path={self.path}, walletName={self.walletName}, masterSlot={self.masterSlot}, baseSlot={self.baseSlot}, accounts={self.accounts})"
+        return f"ZymbitEthKeyring(type={self.type}, basePath={self.basePath}, walletName={self.walletName}, masterSlot={self.masterSlot}, baseSlot={self.baseSlot}, accounts={self.accounts})"

@@ -1,11 +1,13 @@
 from Keyring import Keyring
 from EthAccount import EthAccount
+from EllipticCurve import EllipticCurve
 import zymkey
 from web3 import Web3
 
 class ZymbitEthKeyring(Keyring):
     TYPE: str = "ETH"
     BASEPATH: str = "m/44'/60'/0'/0"
+    CURVE: EllipticCurve = EllipticCurve.secp256k1
 
     def __init__(self, options: dict = {}) -> None:
         super().__init__(options)

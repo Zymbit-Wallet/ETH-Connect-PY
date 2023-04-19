@@ -77,12 +77,10 @@ class ZymbitEthKeyring(Keyring):
         return newAccount
 
     def addAccounts(self, n: int = 1) -> list[EthAccount]:
-        if (not isinstance(n, int)):
-            raise ValueError("Invalid number of accounts")
+        if (not isinstance(n, int) or n < 1):
+            raise ValueError("Invalid number of accounts to add")
 
         newAccounts = []
-        if (n < 1):
-            return newAccounts
         
         for i in range(n):
             newAccountIndex = self._findNextAccountIndex()
@@ -103,7 +101,7 @@ class ZymbitEthKeyring(Keyring):
         
         for index in indexList:
             if (self._accountExists(index)):
-                raise ValueError("One or more accounts already in keyring")
+                raise ValueError("account with index " + str(index) + " already in keyring")
         
         for index in indexList:
             slot = zymkey.client.gen_wallet_child_key(self.baseSlot, index, False)

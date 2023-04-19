@@ -65,12 +65,11 @@ class ZymbitEthKeyring(Keyring):
         return
 
     def addAccount(self, index: int = 0) -> EthAccount:
-        if(index < 0):
-            raise ValueError("Invalid Index")
+        if (not isinstance(index, int) or index < 0):
+            raise ValueError("Invalid index")
 
-        for account in self.accounts:
-            if(account.path == ZymbitEthKeyring.BASEPATH + "/" + str(index)):
-                raise ValueError("Account already exists in keyring")
+        if(self._accountExists(index)):
+            raise ValueError("Account already in keyring")
         
         slot = zymkey.client.gen_wallet_child_key(self.baseSlot, index, False)
         newAccount = EthAccount(ZymbitEthKeyring.BASEPATH + "/" + str(index), self._generateEthAddress(slot), slot)
@@ -78,8 +77,11 @@ class ZymbitEthKeyring(Keyring):
         return newAccount
 
     def addAccounts(self, n: int = 1) -> list[EthAccount]:
+        if (not isinstance(n, int)):
+            raise ValueError("Invalid number of accounts")
+
         newAccounts = []
-        if(n < 1):
+        if (n < 1):
             return newAccounts
         
         for i in range(n):
@@ -91,24 +93,44 @@ class ZymbitEthKeyring(Keyring):
         
         return newAccounts
     
+    def addAccountsList(self, indexList: list[int] = []) -> list[EthAccount]:
+        newAccounts = []
+        if (not all(isinstance(index, int) and index >= 0 for index in indexList)):
+            raise ValueError("Invalid list of indexes")
+        
+        if (len(indexList) < 1):
+            return newAccounts
+        
+        for index in indexList:
+            if(self._accountExists(index)):
+                raise ValueError("One or more accounts already in keyring")
+        
+        for index in indexList:
+            slot = zymkey.client.gen_wallet_child_key(self.baseSlot, index, False)
+            newAccount = EthAccount(ZymbitEthKeyring.BASEPATH + "/" + str(index), self._generateEthAddress(slot), slot)
+            newAccounts.append(newAccount)
+            self.accounts.append(newAccount)
+        
+        return newAccounts
+    
     def getAccounts(self) -> list[EthAccount]:
         return self.accounts
 
     def removeAccount(self, address: str = None, slot: int = None, path: int = None) -> bool:
-        if(slot is None and address is None and path is None):
+        if (slot is None and address is None and path is None):
             raise ValueError("Valid address, slot, or path required")
         for account in self.accounts:
-            if(account.address == address or account.slot == slot or account.path == path):
+            if (account.address == address or account.slot == slot or account.path == path):
                 zymkey.client.remove_key(account.slot)
                 self.accounts.remove(account)
                 return True
         return False
     
     def getPublicKey(self, address: str = None, slot: int = None, path: int = None) -> str:
-        if(slot is None and address is None and path is None):
+        if (slot is None and address is None and path is None):
             raise ValueError("Valid address, slot, or path required")
         for account in self.accounts:
-            if(account.address == address or account.slot == slot or account.path == path):
+            if (account.address == address or account.slot == slot or account.path == path):
                 return account.getPublicKey()
         return ValueError("Account not in keyring")
 
@@ -130,14 +152,21 @@ class ZymbitEthKeyring(Keyring):
     def _findNextAccountIndex(self) -> int:
         maxAccountIndex: int = 0
         for account in self.accounts:
-            if (int(account.path[len(ZymbitEthKeyring.BASEPATH + "/"):]) > maxAccountIndex):
-                maxAccountIndex += 1
+            accountIndex = int(account.path[len(ZymbitEthKeyring.BASEPATH + "/"):])
+            if (accountIndex > maxAccountIndex):
+                maxAccountIndex = accountIndex
         return maxAccountIndex + 1
     
     def _generateEthAddress(self, slot: int) -> str:
         publicKey = zymkey.client.get_public_key(slot)
         keccakHash = Web3.keccak(bytes(publicKey)).hex()
         return Web3.toChecksumAddress(keccakHash[-40:])
+
+    def _accountExists(self, index: int):
+        for account in self.accounts:
+            if (account.path == ZymbitEthKeyring.BASEPATH + "/" + str(index)):
+                return True
+        return False
     
     def __repr__(self) -> str:
         accounts = "\n\t\t".join([account.__repr__() for account in self.accounts])

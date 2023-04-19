@@ -25,7 +25,7 @@ class ZymbitEthKeyring(Keyring):
         if ("walletName" not in options and "masterSlot" not in options):
             raise KeyError("walletName and masterSlot properties missing from options")
 
-        if("walletName" in options):
+        if ("walletName" in options):
             try:
                 self.masterSlot: int = zymkey.client.get_wallet_key_slot('m', options["walletName"])
                 self.walletName: str = options["walletName"]
@@ -58,8 +58,8 @@ class ZymbitEthKeyring(Keyring):
                     self.accounts.append(EthAccount(path, self._generateEthAddress(slot), slot))
                 elif (path in ZymbitEthKeyring.BASEPATH and len(path) > len(deepestPath["path"])):
                     deepestPath = {"path": path, "slot": slot}
-        
-        if(self.baseSlot == 0):
+
+        if (self.baseSlot == 0):
             self.baseSlot = self._generateBasePathKey(deepestPath)
             
         return
@@ -68,7 +68,7 @@ class ZymbitEthKeyring(Keyring):
         if (not isinstance(index, int) or index < 0):
             raise ValueError("Invalid index")
 
-        if(self._accountExists(index)):
+        if (self._accountExists(index)):
             raise ValueError("Account already in keyring")
         
         slot = zymkey.client.gen_wallet_child_key(self.baseSlot, index, False)
@@ -102,7 +102,7 @@ class ZymbitEthKeyring(Keyring):
             return newAccounts
         
         for index in indexList:
-            if(self._accountExists(index)):
+            if (self._accountExists(index)):
                 raise ValueError("One or more accounts already in keyring")
         
         for index in indexList:

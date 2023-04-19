@@ -20,4 +20,4 @@ class EthAccount(Account):
         return '0x' + binascii.hexlify(publicKey).decode('utf-8')
     
     def __repr__(self) -> str:
-        return f"Path: {self.path}, Address: {self.address}, Slot: {self.slot}"
+        return f"(Path: {self.path}, Address: {self.address}, Slot: {self.slot})"

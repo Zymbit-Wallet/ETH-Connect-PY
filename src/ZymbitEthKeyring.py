@@ -99,7 +99,14 @@ class ZymbitEthKeyring(ZymbitKeyringInterface):
                 self.accounts.remove(account)
                 return True
         return False
-                    
+    
+    def getPublicKey(self, address: str = None, slot: int = None, path: int = None) -> str:
+        if(slot is None and address is None and path is None):
+            raise ValueError("Valid address, slot, or path required")
+        for account in self.accounts:
+            if(account.address == address or account.slot == slot or account.path == path):
+                return account.getPublicKey()
+        return ValueError("Account not in keyring")
 
     def _generateBasePathKey(self, deepestPath) -> int:
         slot = 0

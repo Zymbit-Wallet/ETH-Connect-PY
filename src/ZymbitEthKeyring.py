@@ -17,7 +17,7 @@ class ZymbitEthKeyring(ZymbitKeyringInterface):
             "type": self.type,
             "basePath": self.basePath,
             "baseSlot": self.baseSlot,
-            "accounts": [account.serialize() for account in self.accounts],
+            "accounts": [account.serialize() for account in self.accounts]
         }
         return serializedKeyring
 

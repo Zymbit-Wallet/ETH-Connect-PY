@@ -140,5 +140,5 @@ class ZymbitEthKeyring(Keyring):
         return Web3.toChecksumAddress(keccakHash[-40:])
     
     def __repr__(self) -> str:
-        accounts = "\n\t".join([account.__repr__() for account in self.accounts])
-        return f"ZymbitEthKeyring(\n\ttype={self.type}\n\tbasePath={self.basePath}\n\twalletName={self.walletName}\n\tmasterSlot={self.masterSlot}\n\tbaseSlot={self.baseSlot}\n\taccounts=[\n\t{accounts}\n])"
+        accounts = "\n\t\t".join([account.__repr__() for account in self.accounts])
+        return f"ZymbitEthKeyring(\n\ttype = {self.type}\n\tbasePath = {self.basePath}\n\twalletName = {self.walletName}\n\tmasterSlot = {self.masterSlot}\n\tbaseSlot = {self.baseSlot}\n\taccounts = [\n\t\t{accounts}\n\t]\n)"

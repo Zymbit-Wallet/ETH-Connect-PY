@@ -1,9 +1,9 @@
-from ZymbitKeyringInterface import ZymbitKeyringInterface
+from Keyring import Keyring
 from EthAccount import EthAccount
 import zymkey
 from web3 import Web3
 
-class ZymbitEthKeyring(ZymbitKeyringInterface):
+class ZymbitEthKeyring(Keyring):
     type: str = "ETH"
     basePath: str = "m/44'/60'/0'/0"
 
@@ -64,7 +64,7 @@ class ZymbitEthKeyring(ZymbitKeyringInterface):
             
         return
 
-    def addAccounts(self, n: int = 1) -> list[dict]:
+    def addAccounts(self, n: int = 1) -> list[EthAccount]:
         newAccounts = []
         if(n < 1):
             return newAccounts
@@ -78,7 +78,7 @@ class ZymbitEthKeyring(ZymbitKeyringInterface):
         
         return newAccounts
         
-    def addAccount(self, index: int = 0) -> dict:
+    def addAccount(self, index: int = 0) -> EthAccount:
         if(index < 0):
             raise ValueError("Invalid Index")
 
@@ -91,7 +91,7 @@ class ZymbitEthKeyring(ZymbitKeyringInterface):
         self.accounts.append(newAccount)
         return newAccount
     
-    def getAccounts(self) -> list[dict]:
+    def getAccounts(self) -> list[EthAccount]:
         return self.accounts
 
     def removeAccount(self, address: str = None, slot: int = None, path: int = None) -> bool:

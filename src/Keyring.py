@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
+from Account import Account
 
-class ZymbitKeyringInterface(ABC):
+class Keyring(ABC):
     type: str
     basePath: str
 
@@ -16,11 +17,15 @@ class ZymbitKeyringInterface(ABC):
         pass
 
     @abstractmethod
-    def addAccounts(self, n: int = 1) -> list[dict]:
+    def addAccount(self, index: int = 0) -> Account:
         pass
 
     @abstractmethod
-    def getAccounts(self) -> list[str]:
+    def addAccounts(self, n: int = 1) -> list[Account]:
+        pass
+
+    @abstractmethod
+    def getAccounts(self) -> list[Account]:
         pass
 
     @abstractmethod

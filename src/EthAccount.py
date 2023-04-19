@@ -1,7 +1,8 @@
+from Account import Account
 import zymkey
 import binascii
 
-class EthAccount():
+class EthAccount(Account):
     def __init__(self, path: str, address: str, slot: int) -> None:
         self.path = path
         self.address = address

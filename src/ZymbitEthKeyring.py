@@ -150,12 +150,12 @@ class ZymbitEthKeyring(Keyring):
         return self._generateBasePathKey({"path": path, "slot": slot})
     
     def _findNextAccountIndex(self) -> int:
-        maxAccountIndex: int = 0
+        nextAccountIndex: int = 0
         for account in self.accounts:
             accountIndex = int(account.path[len(ZymbitEthKeyring.BASEPATH + "/"):])
-            if (accountIndex > maxAccountIndex):
-                maxAccountIndex = accountIndex
-        return maxAccountIndex + 1
+            if (accountIndex >= nextAccountIndex):
+                nextAccountIndex = accountIndex + 1
+        return nextAccountIndex
     
     def _generateEthAddress(self, slot: int) -> str:
         publicKey = zymkey.client.get_public_key(slot)

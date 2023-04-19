@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 from Account import Account
 
 class Keyring(ABC):
-    type: str
-    basePath: str
+    TYPE: str
+    BASEPATH: str
 
     def __init__(self, options: dict = {}) -> None:
         self.deserialize(options)

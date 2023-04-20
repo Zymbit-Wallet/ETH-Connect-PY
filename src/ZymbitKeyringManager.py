@@ -21,10 +21,12 @@ class ZymbitKeyringManager():
         if (not isinstance(masterGenKey, bytearray)):
             raise TypeError("Invalid masterGenKey")
         
+        masterKeySlot: int = 0
         try:
             use_BIP39_recovery = zymkey.RecoveryStrategyBIP39()
             keyType: str = keyringClass.CURVE.getCurveType()
             masterKey: tuple[int, str] = zymkey.client.gen_wallet_master_seed(key_type = keyType, master_gen_key = masterGenKey, wallet_name = walletName, recovery_strategy = use_BIP39_recovery)
+            masterKeySlot = masterKey[0]
 
             options = {
                 "walletName": walletName
@@ -33,9 +35,11 @@ class ZymbitKeyringManager():
             self.keyrings.append(keyring)
             return masterKey
         except:
-            raise ValueError("Invalid walletName or masterGenKey")
+            if masterKeySlot:
+                zymkey.client.remove_key(masterKeySlot)
 
-
+            raise ValueError("Failed to create keyring")
+        
     def addKeyring(self, keyring: Type[Keyring]) -> bool:
         if (not issubclass(keyring, Keyring)):
             raise TypeError(f"Invalid type: {type(keyring)}. Expected a subclass of the Keyring class")
@@ -66,11 +70,8 @@ class ZymbitKeyringManager():
                 for slot in slots:
                     (path, currWalletName, currMasterSlot) = zymkey.client.get_wallet_node_addr(slot)
                     if (walletName == currWalletName or masterSlot == currMasterSlot):
-                        if (path == 'm'):
-                            if (removeMaster):
-                                zymkey.client.remove_key(slot)
-                            else:
-                                continue
+                        if (path == 'm' and not removeMaster):
+                            continue
                         else:
                             zymkey.client.remove_key(slot)
                 return True

@@ -6,17 +6,17 @@ import re
 
 class Keyring(ABC):
     TYPE: str
-    BASEPATH: str
+    BASE_PATH: str
     CURVE: EllipticCurve
 
     def __init__(self, options: dict = {}) -> None:
-        if (not isinstance(self.CURVE, EllipticCurve)):
+        if not isinstance(self.CURVE, EllipticCurve):
             raise TypeError("Invalid elliptic curve type. CURVE should be an instance of the EllipticCurve enumeration.")
-        if (not self._isValidBip44BasePath(self.BASEPATH)):
-            raise TypeError("Invalid BIP44 BASEPATH")
+        if not self._is_valid_bip44_base_path(self.BASE_PATH):
+            raise TypeError("Invalid BIP44 BASE_PATH")
         self.deserialize(options)
-        if not (hasattr(self, 'walletName') and hasattr(self, 'masterSlot')):
-            raise TypeError("Subclasses of Keyring must have instance properties 'walletName' and 'masterSlot'")
+        if not (hasattr(self, 'wallet_name') and hasattr(self, 'master_slot')):
+            raise TypeError("Subclasses of Keyring must have instance properties 'wallet_name' and 'master_slot'")
 
     @abstractmethod
     def serialize(self) -> dict:
@@ -27,25 +27,22 @@ class Keyring(ABC):
         pass
 
     @abstractmethod
-    def addAccount(self, index: int = 0) -> Type[Account]:
+    def add_account(self, index: int = 0) -> Type[Account]:
         pass
 
     @abstractmethod
-    def addAccounts(self, n: int = 1) -> list[Type[Account]]:
+    def add_accounts(self, n: int = 1) -> list[Type[Account]]:
         pass
 
     @abstractmethod
-    def getAccounts(self) -> list[Type[Account]]:
+    def get_accounts(self) -> list[Type[Account]]:
         pass
 
     @abstractmethod
-    def removeAccount(self, address: str = None, slot: int = None, path: int = None) -> bool:
+    def remove_account(self, address: str = None, slot: int = None, path: int = None) -> bool:
         pass
 
     @staticmethod
-    def _isValidBip44BasePath(s: str) -> bool:
+    def _is_valid_bip44_base_path(s: str) -> bool:
         pattern = r"^m\/\d+'\/\d+'\/\d+'\/\d+$"
         return bool(re.match(pattern, s)) and " " not in s
-
-
-    

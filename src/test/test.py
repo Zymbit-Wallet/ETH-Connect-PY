@@ -4,16 +4,14 @@ from ZymbitEthKeyring import ZymbitEthKeyring
 from ZymbitKeyringManager import ZymbitKeyringManager
 import zymkey
 
-keyringManager = ZymbitKeyringManager()
+options = {
+    "wallet_name": "MyExampleWallet"
+}
 
-print(keyringManager.createKeyring(ZymbitEthKeyring, "MyExampleWallet"))
+keyring = ZymbitEthKeyring(options)
 
-print(keyringManager.getKeyring(walletName="MyExampleWallet"))
+print(keyring)
 
-# options = {
-#     "walletName": "MyExampleWallet"
-# }
+keyringManager = ZymbitKeyringManager([keyring])
 
-# keyring = ZymbitEthKeyring(options)
-
-# print(keyring)
+print(keyringManager.get_keyring(wallet_name="MyExampleWallet"))

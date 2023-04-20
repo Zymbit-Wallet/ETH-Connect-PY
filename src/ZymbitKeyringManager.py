@@ -4,12 +4,12 @@ import zymkey
 
 class ZymbitKeyringManager():
     
-    def __init__(self, keyrings: list[Keyring] = []) -> None:
+    def __init__(self, keyrings: list[Type[Keyring]] = []) -> None:
         if keyrings:
             for keyring in keyrings:
-                if (not issubclass(keyring, Keyring)):
+                if (not issubclass(keyring, Type[Keyring])):
                     raise TypeError(f"Invalid type: {type(keyring)}. Expected a subclass of the Keyring class")
-            self.keyrings: list[Keyring] = keyrings
+            self.keyrings: list[Type[Keyring]] = keyrings
 
     def createKeyring(self, keyringClass: Type[Keyring], walletName: str, masterGenKey: bytearray = bytearray()) -> tuple[int, str]:
         if (not issubclass(keyringClass, Keyring)):
@@ -36,8 +36,24 @@ class ZymbitKeyringManager():
             raise ValueError("Failed to create keyring")
 
 
-    def addKeyring(self, keyring: Keyring):
+    def addKeyring(self, keyring: Type[Keyring]) -> bool:
         if (not issubclass(keyring, Keyring)):
             raise TypeError(f"Invalid type: {type(keyring)}. Expected a subclass of the Keyring class")
         self.keyrings.append(keyring)
+        return True
+          
+    def getKeyring(self, walletName: str, masterSlot: int) -> Type[Keyring]:
+        if(walletName is None and masterSlot is None):
+            raise ValueError("walletName or masterSlot are required")
+        
+        for keyring in self.keyrings:
+            if (keyring.walletName == walletName or keyring.masterSlot == masterSlot):
+                return keyring
+            
+        raise ValueError("Keyring does not exist in KeyringManager")
+
+    def getKeyrings(self) -> list[Type[Keyring]]:
+        return self.keyrings
+
+    
     

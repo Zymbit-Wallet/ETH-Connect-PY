@@ -23,9 +23,9 @@ class ZymbitEthKeyring(Keyring):
         }
         return serializedKeyring
 
-    def deserialize(self, options: dict = {}) -> None:
+    def deserialize(self, options: dict = {}) -> bool:
         if ("walletName" not in options and "masterSlot" not in options):
-            raise KeyError("walletName and masterSlot properties missing from options")
+            raise KeyError("walletName and masterSlot properties required in options")
 
         if ("walletName" in options):
             try:
@@ -64,7 +64,7 @@ class ZymbitEthKeyring(Keyring):
         if (self.baseSlot == 0):
             self.baseSlot = self._generateBasePathKey(deepestPath)
             
-        return
+        return True
 
     def addAccount(self, index: int = 0) -> EthAccount:
         if (not isinstance(index, int) or index < 0):

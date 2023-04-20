@@ -9,7 +9,7 @@ class ZymbitKeyringManager():
             for keyring in keyrings:
                 if (not issubclass(keyring, Type[Keyring])):
                     raise TypeError(f"Invalid type: {type(keyring)}. Expected a subclass of the Keyring class")
-            self.keyrings: list[Type[Keyring]] = keyrings
+        self.keyrings: list[Type[Keyring]] = keyrings
 
     def createKeyring(self, keyringClass: Type[Keyring], walletName: str, masterGenKey: bytearray = bytearray()) -> tuple[int, str]:
         if (not issubclass(keyringClass, Keyring)):
@@ -33,7 +33,7 @@ class ZymbitKeyringManager():
             self.keyrings.append(keyring)
             return masterKey
         except:
-            raise ValueError("Failed to create keyring")
+            raise ValueError
 
 
     def addKeyring(self, keyring: Type[Keyring]) -> bool:
@@ -42,8 +42,8 @@ class ZymbitKeyringManager():
         self.keyrings.append(keyring)
         return True
           
-    def getKeyring(self, walletName: str, masterSlot: int) -> Type[Keyring]:
-        if(walletName is None and masterSlot is None):
+    def getKeyring(self, walletName: str = None, masterSlot: int = None) -> Type[Keyring]:
+        if(not (walletName or masterSlot)):
             raise ValueError("walletName or masterSlot are required")
         
         for keyring in self.keyrings:
@@ -54,6 +54,29 @@ class ZymbitKeyringManager():
 
     def getKeyrings(self) -> list[Type[Keyring]]:
         return self.keyrings
+    
+    def removeKeyring(self, walletName: str = None, masterSlot: int = None, removeMaster: bool = False) -> bool:
+        if(not (walletName or masterSlot)):
+            raise ValueError("walletName or masterSlot are required")
+        
+        for keyring in self.keyrings:
+            if (keyring.walletName == walletName or keyring.masterSlot == masterSlot):
+                slots: list[int] = zymkey.client.get_slot_alloc_list()[0]
+                slots = list(filter(lambda slot: slot > 15, slots))
+                for slot in slots:
+                    (path, currWalletName, currMasterSlot) = zymkey.client.get_wallet_node_addr(slot)
+                    if (walletName == currWalletName or masterSlot == currMasterSlot):
+                        if (path == 'm'):
+                            if (removeMaster):
+                                zymkey.client.remove_key(slot)
+                            else:
+                                continue
+                        else:
+                            zymkey.client.remove_key(slot)
+                return True
+
+        return False
+        
 
     
     

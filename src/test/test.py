@@ -1,12 +1,19 @@
 import sys
 sys.path.append('../')
 from ZymbitEthKeyring import ZymbitEthKeyring
+from ZymbitKeyringManager import ZymbitKeyringManager
 import zymkey
 
-options = {
-    "walletName": "MyExampleWallet"
-}
+keyringManager = ZymbitKeyringManager()
 
-keyring = ZymbitEthKeyring(options)
+print(keyringManager.createKeyring(ZymbitEthKeyring, "MyExampleWallet"))
 
-print(keyring)
+print(keyringManager.getKeyring(walletName="MyExampleWallet"))
+
+# options = {
+#     "walletName": "MyExampleWallet"
+# }
+
+# keyring = ZymbitEthKeyring(options)
+
+# print(keyring)

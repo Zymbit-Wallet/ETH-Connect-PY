@@ -48,7 +48,7 @@ class ZymbitEthKeyring(Keyring):
         self.accounts: list[EthAccount] = []
         deepestPath: dict = {"path": "m", "slot": self.masterSlot}
 
-        slots: list = zymkey.client.get_slot_alloc_list()[0]
+        slots: list[int] = zymkey.client.get_slot_alloc_list()[0]
         slots = list(filter(lambda slot: slot > 15, slots))
 
         for slot in slots:
@@ -117,7 +117,7 @@ class ZymbitEthKeyring(Keyring):
         return self.accounts
 
     def removeAccount(self, address: str = None, slot: int = None, path: int = None) -> bool:
-        if (slot is None and address is None and path is None):
+        if (not (slot or address or path)):
             raise ValueError("Valid address, slot, or path required")
         for account in self.accounts:
             if (account.address == address or account.slot == slot or account.path == path):
@@ -127,7 +127,7 @@ class ZymbitEthKeyring(Keyring):
         return False
     
     def getPublicKey(self, address: str = None, slot: int = None, path: int = None) -> str:
-        if (slot is None and address is None and path is None):
+        if (not (slot or address or path)):
             raise ValueError("Valid address, slot, or path required")
         for account in self.accounts:
             if (account.address == address or account.slot == slot or account.path == path):

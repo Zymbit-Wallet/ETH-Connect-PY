@@ -33,7 +33,7 @@ class ZymbitKeyringManager():
             self.keyrings.append(keyring)
             return masterKey
         except:
-            raise ValueError
+            raise ValueError("Invalid walletName or masterGenKey")
 
 
     def addKeyring(self, keyring: Type[Keyring]) -> bool:

@@ -10,9 +10,9 @@ from typing import Union
 class EthConnect():
     
     @staticmethod
-    def create_eth_transaction(chain_id: int = 1, nonce: int = 0, max_priority_fee_per_gas: int = 1, max_fee_per_gas: int = 10,
-                                gas: int = 21000, to: str = None, value: int = 0, 
-                                data: str = "0x", access_list: list = []) -> EthTransaction:
+    def create_eth_transaction(chain_id: int = 1, nonce: int = 0, max_priority_fee_per_gas: int = 1, 
+                               max_fee_per_gas: int = 10, gas: int = 21000, to: str = None, 
+                               value: int = 0, data: str = "0x", access_list: list = []) -> EthTransaction:
 
         if not isinstance(chain_id, int) or not isinstance(nonce, int) or not isinstance(max_priority_fee_per_gas, int) \
             or not isinstance(max_fee_per_gas, int) or not isinstance(gas, int) or not isinstance(to, str) \

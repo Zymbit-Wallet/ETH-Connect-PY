@@ -20,9 +20,7 @@ keyring1 = ZymbitEthKeyring(options)
 keyringManager = ZymbitKeyringManager([keyring, keyring1])
 print(keyringManager.get_keyrings())
 
-ethconnect = EthConnect()
-
-transaction = EthConnect.create_eth_transaction(chain_id=11155111, to=keyring.get_accounts()[0].address, value=EthConnect.eth_to_wei(0.00001))
+transaction = EthConnect.create_eth_transaction(chain_id=11155111, nonce=2, to=keyring.get_accounts()[1].address, value=EthConnect.eth_to_wei(0.00001))
 
 signedTx = EthConnect.sign_eth_transaction(transaction, keyring1, slot = 30)
 
@@ -34,6 +32,8 @@ deserialized = EthConnect.rlp_deserialize_transaction(serialized)
 
 print(deserialized)
 
-transaction_result_hash = w3.eth.send_raw_transaction(serialized)
-print("Transaction broadcast hash:\n%s" %
-binascii.hexlify(transaction_result_hash).decode("utf-8"))
+print(EthConnect.sha256('shiv'))
+
+# transaction_result_hash = w3.eth.send_raw_transaction(serialized)
+# print("Transaction broadcast hash:\n%s" %
+# binascii.hexlify(transaction_result_hash).decode("utf-8"))

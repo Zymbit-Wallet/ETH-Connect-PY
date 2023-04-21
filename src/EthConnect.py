@@ -5,6 +5,7 @@ import zymkey
 from web3 import Web3
 import binascii
 import rlp
+import hashlib
 from typing import Union
 
 class EthConnect():
@@ -82,6 +83,40 @@ class EthConnect():
 
         return transaction
     
+    @staticmethod
+    def keccak256(str_data: str = None, bytes_data: bytes = None) -> str:
+
+        if str_data is not None and bytes_data is not None:
+            raise ValueError("Both str_data and bytes_data should not be provided at the same time.")
+        
+        if str_data is None and bytes_data is None:
+            raise ValueError("Either str_data or bytes_data should be provided.")
+
+        if str_data is not None:
+            data = str_data.encode('utf-8')
+        else:
+            data = bytes_data
+
+        keccak_hash = Web3.keccak(data)
+        return keccak_hash.hex()
+    
+    @staticmethod
+    def sha256(str_data: str = None, bytes_data: bytes = None) -> str:
+        if str_data is not None and bytes_data is not None:
+            raise ValueError("Both str_data and bytes_data should not be provided at the same time.")
+        
+        if str_data is None and bytes_data is None:
+            raise ValueError("Either str_data or bytes_data should be provided.")
+
+        if str_data is not None:
+            data = str_data.encode('utf-8')
+        else:
+            data = bytes_data
+
+        sha256_hash = hashlib.sha256(data)
+
+        return "0x" + sha256_hash.hexdigest()
+
     @staticmethod
     def eth_to_wei(ether_amount: float = 0) -> int:
         return Web3.toWei(number = ether_amount, unit = "ether")

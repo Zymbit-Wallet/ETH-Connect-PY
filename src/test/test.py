@@ -7,8 +7,6 @@ from ZymbitKeyringManager import ZymbitKeyringManager
 from EthConnect import EthConnect
 import zymkey
 
-
-
 options = {
     "wallet_name": "MyExampleWallet"
 }
@@ -33,6 +31,10 @@ deserialized = EthConnect.rlp_deserialize_transaction(serialized)
 print(deserialized)
 
 print(EthConnect.sha256('shiv'))
+print(EthConnect.keccak256('shiv'))
+
+sig = EthConnect.sign_message(EthConnect.keccak256('shiv'), keyring, '0x93D458d6B14A02943A07708a24D8A9F142Fc5A00')
+print(EthConnect.concatenate_eth_sig(sig[0], sig[1], sig[2]))
 
 # transaction_result_hash = w3.eth.send_raw_transaction(serialized)
 # print("Transaction broadcast hash:\n%s" %

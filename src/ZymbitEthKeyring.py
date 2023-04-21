@@ -1,8 +1,10 @@
 from Keyring import Keyring
 from EthAccount import EthAccount
 from EllipticCurve import EllipticCurve
+from EthTransaction import EthTransaction, SignedEthTransaction
 import zymkey
 from web3 import Web3
+import rlp
 
 class ZymbitEthKeyring(Keyring):
     TYPE: str = "ETH"
@@ -133,6 +135,38 @@ class ZymbitEthKeyring(Keyring):
             if (account.address == address or account.slot == slot or account.path == path):
                 return account.get_public_key()
         return ValueError("Account not in keyring")
+    
+    def sign_transaction(self, transaction: EthTransaction, address: str = None, slot: int = None, path: int = None):
+
+        if (not isinstance(transaction, EthTransaction)):
+            raise ValueError("Transaction is required to be of type EthTransaction")
+
+        if (not (slot or address or path)):
+            raise ValueError("Valid address, slot, or path required")
+        
+        for account in self.accounts:
+            if (account.address == address or account.slot == slot or account.path == path):
+                encoded_transaction = bytes([2]) + rlp.encode(transaction)
+                transactionDigest = Web3.keccak(encoded_transaction)
+                (signature, y_parity) = zymkey.client.sign_digest(transactionDigest, 21, return_recid=True)
+                (v, r, s) = self._gen_valid_eth_sig(signature, y_parity, transaction.chainId)
+                signedTransaction = SignedEthTransaction(
+                    chainId=transaction.chainId,
+                    nonce=transaction.nonce,
+                    maxPriorityFeePerGas=transaction.maxPriorityFeePerGas,
+                    maxFeePerGas=transaction.maxFeePerGas,
+                    gas=transaction.gas,
+                    to=transaction.to,
+                    value=transaction.value,
+                    data=transaction.data,
+                    accessList=transaction.accessList,
+                    y_parity = y_parity,
+                    r = r,
+                    s = s
+                )
+                return signedTransaction
+        
+        raise ValueError("Account does not exist in keyring")
 
     def _generate_base_path_key(self, deepest_path) -> int:
         slot = 0
@@ -167,6 +201,19 @@ class ZymbitEthKeyring(Keyring):
             if (account.path == ZymbitEthKeyring.BASE_PATH + "/" + str(index)):
                 return True
         return False
+    
+    def _gen_valid_eth_sig(self, signature: bytearray, y_parity: int, chain_id: int = 1) -> tuple[int, int, int]:
+            N = 115792089237316195423570985008687907852837564279074904382605163141518161494337
+            r = int.from_bytes(signature[:32], "big")
+            s = int.from_bytes(signature[-32:], "big")
+
+            y_parity = bool(y_parity.value)
+            if((s*2) >= N):
+                y_parity = not y_parity
+                s = N - s
+            v = chain_id * 2 + 35 + int(y_parity)
+
+            return (v, r, s)
 
     def __repr__(self) -> str:
         accounts = "\n\t\t".join([account.__repr__() for account in self.accounts])

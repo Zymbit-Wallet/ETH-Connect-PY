@@ -8,32 +8,32 @@ class EthTransaction(rlp.Serializable):
     transaction_type = 2
 
     fields = [
-        ("chainId", big_endian_int),
+        ("chain_id", big_endian_int),
         ("nonce", big_endian_int),
-        ("maxPriorityFeePerGas", big_endian_int),
-        ("maxFeePerGas", big_endian_int),
+        ("max_priority_fee_per_gas", big_endian_int),
+        ("max_fee_per_gas", big_endian_int),
         ("gas", big_endian_int),
         ("to", Binary.fixed_length(20, allow_empty=True)),
         ("value", big_endian_int),
         ("data", binary),
-        ("accessList", access_list_sede_type),
+        ("access_list", access_list_sede_type),
     ]
 
+# Signed Transaction EIP-1559 
 class SignedEthTransaction(rlp.Serializable):
     transaction_type = 2
 
     fields = [
-        ("chainId", big_endian_int),
+        ("chain_id", big_endian_int),
         ("nonce", big_endian_int),
-        ("maxPriorityFeePerGas", big_endian_int),
-        ("maxFeePerGas", big_endian_int),
+        ("max_priority_fee_per_gas", big_endian_int),
+        ("max_fee_per_gas", big_endian_int),
         ("gas", big_endian_int),
         ("to", Binary.fixed_length(20, allow_empty=True)),
         ("value", big_endian_int),
         ("data", binary),
-        ("accessList", access_list_sede_type),
-        ("yParity", boolean),
+        ("access_list", access_list_sede_type),
+        ("y_parity", boolean),
         ("r", big_endian_int),
         ("s", big_endian_int),
-
     ]

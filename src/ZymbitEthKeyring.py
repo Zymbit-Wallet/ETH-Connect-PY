@@ -151,15 +151,15 @@ class ZymbitEthKeyring(Keyring):
                 (signature, y_parity) = zymkey.client.sign_digest(transactionDigest, 21, return_recid=True)
                 (v, r, s) = self._gen_valid_eth_sig(signature, y_parity, transaction.chainId)
                 signedTransaction = SignedEthTransaction(
-                    chainId=transaction.chainId,
-                    nonce=transaction.nonce,
-                    maxPriorityFeePerGas=transaction.maxPriorityFeePerGas,
-                    maxFeePerGas=transaction.maxFeePerGas,
-                    gas=transaction.gas,
-                    to=transaction.to,
-                    value=transaction.value,
-                    data=transaction.data,
-                    accessList=transaction.accessList,
+                    chain_id = transaction.chain_id,
+                    nonce = transaction.nonce,
+                    max_priority_fee_per_gas = transaction.max_priority_fee_per_gas,
+                    max_fee_per_gas = transaction.max_fee_per_gas,
+                    gas = transaction.gas,
+                    to = transaction.to,
+                    value = transaction.value,
+                    data = transaction.data,
+                    access_list = transaction.access_list,
                     y_parity = y_parity,
                     r = r,
                     s = s

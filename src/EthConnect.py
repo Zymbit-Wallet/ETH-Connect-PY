@@ -81,3 +81,7 @@ class EthConnect():
                 raise ValueError("Failed to deserialize the encoded transaction")
 
         return transaction
+    
+    @staticmethod
+    def eth_to_wei(ether_amount: float = 0) -> int:
+        return Web3.toWei(number = ether_amount, unit = "ether")

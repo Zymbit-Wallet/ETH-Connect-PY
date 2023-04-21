@@ -4,6 +4,7 @@ from EllipticCurve import EllipticCurve
 from EthTransaction import EthTransaction, SignedEthTransaction
 import zymkey
 from web3 import Web3
+from Crypto.Hash import keccak 
 import rlp
 
 class ZymbitEthKeyring(Keyring):
@@ -147,9 +148,10 @@ class ZymbitEthKeyring(Keyring):
         for account in self.accounts:
             if (account.address == address or account.slot == slot or account.path == path):
                 encoded_transaction = bytes([2]) + rlp.encode(transaction)
-                transactionDigest = Web3.keccak(encoded_transaction)
-                (signature, y_parity) = zymkey.client.sign_digest(transactionDigest, 21, return_recid=True)
-                (v, r, s) = self._gen_valid_eth_sig(signature, y_parity, transaction.chainId)
+                keccak_digest = keccak.new(digest_bits=256)
+                keccak_digest.update(encoded_transaction)
+                (signature, y_parity) = zymkey.client.sign_digest(keccak_digest, account.slot, return_recid=True)
+                (y_parity, v, r, s) = self._gen_valid_eth_sig(signature, y_parity, transaction.chain_id)
                 signedTransaction = SignedEthTransaction(
                     chain_id = transaction.chain_id,
                     nonce = transaction.nonce,
@@ -202,7 +204,7 @@ class ZymbitEthKeyring(Keyring):
                 return True
         return False
     
-    def _gen_valid_eth_sig(self, signature: bytearray, y_parity: int, chain_id: int = 1) -> tuple[int, int, int]:
+    def _gen_valid_eth_sig(self, signature: bytearray, y_parity: int, chain_id: int = 1) -> tuple[bool, int, int, int]:
             N = 115792089237316195423570985008687907852837564279074904382605163141518161494337
             r = int.from_bytes(signature[:32], "big")
             s = int.from_bytes(signature[-32:], "big")
@@ -213,7 +215,7 @@ class ZymbitEthKeyring(Keyring):
                 s = N - s
             v = chain_id * 2 + 35 + int(y_parity)
 
-            return (v, r, s)
+            return (y_parity, v, r, s)
 
     def __repr__(self) -> str:
         accounts = "\n\t\t".join([account.__repr__() for account in self.accounts])

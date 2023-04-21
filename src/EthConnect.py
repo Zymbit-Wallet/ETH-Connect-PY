@@ -9,6 +9,7 @@ from typing import Union
 
 class EthConnect():
     
+    @staticmethod
     def create_eth_transaction(chain_id: int = 1, nonce: int = 0, max_priority_fee_per_gas: int = 1, max_fee_per_gas: int = 10,
                                 gas: int = 21000, to: str = None, value: int = 0, 
                                 data: str = "0x", access_list: list = []) -> EthTransaction:
@@ -35,6 +36,7 @@ class EthConnect():
 
         return transaction
     
+    @staticmethod
     def sign_eth_transaction(transaction: EthTransaction, keyring: ZymbitEthKeyring, address: str = None, slot: int = None, path: int = None) -> SignedEthTransaction:
 
         if (not isinstance(transaction, EthTransaction)):
@@ -48,7 +50,8 @@ class EthConnect():
         
         return keyring.sign_transaction(transaction, address, slot, path)
     
-    def rlp_serialize_transaction(self, transaction: Union[EthTransaction, SignedEthTransaction]) -> bytes:
+    @staticmethod
+    def rlp_serialize_transaction(transaction: Union[EthTransaction, SignedEthTransaction]) -> bytes:
 
         if (not (isinstance(transaction, EthTransaction) or isinstance(transaction, SignedEthTransaction))):
             raise ValueError("Transaction has to be of type EthTransaction or SignedEthTransaction")
@@ -56,6 +59,7 @@ class EthConnect():
         encoded_transaction = bytes([2]) + rlp.encode(transaction)
         return encoded_transaction
 
+    @staticmethod
     def rlp_deserialize_transaction(encoded_transaction: bytes) -> Union[EthTransaction, SignedEthTransaction]:
 
         if not isinstance(encoded_transaction, bytes):

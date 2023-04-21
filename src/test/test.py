@@ -10,8 +10,12 @@ options = {
 
 keyring = ZymbitEthKeyring(options)
 
-print(keyring)
+options = {
+    "wallet_name": "MyExampleWallet1"
+}
 
-keyringManager = ZymbitKeyringManager([keyring])
+keyring1 = ZymbitEthKeyring(options)
 
-print(keyringManager.get_keyring(wallet_name="MyExampleWallet"))
+keyringManager = ZymbitKeyringManager([keyring, keyring1])
+
+print(keyringManager.get_keyrings())

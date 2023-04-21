@@ -29,7 +29,7 @@ class ZymbitKeyringManager:
             master_key_slot = master_key[0]
 
             options = {
-                "walletName": wallet_name
+                "wallet_name": wallet_name
             }
             keyring: keyring_class = keyring_class(options)
             self.keyrings.append(keyring)

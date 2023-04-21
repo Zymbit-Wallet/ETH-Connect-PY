@@ -150,8 +150,8 @@ class ZymbitEthKeyring(Keyring):
                 encoded_transaction = bytes([2]) + rlp.encode(transaction)
                 keccak_digest = keccak.new(digest_bits=256)
                 keccak_digest.update(encoded_transaction)
-                (signature, y_parity) = zymkey.client.sign_digest(keccak_digest, account.slot, return_recid=True)
-                (y_parity, v, r, s) = self._gen_valid_eth_sig(signature, y_parity, transaction.chain_id)
+                (signature, raw_y_parity) = zymkey.client.sign_digest(keccak_digest, account.slot, return_recid=True)
+                (y_parity, v, r, s) = self._gen_valid_eth_sig(signature, raw_y_parity, transaction.chain_id)
                 signedTransaction = SignedEthTransaction(
                     chain_id = transaction.chain_id,
                     nonce = transaction.nonce,

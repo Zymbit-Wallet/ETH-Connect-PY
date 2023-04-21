@@ -57,6 +57,7 @@ class EthConnect():
         return encoded_transaction
 
     def rlp_deserialize_transaction(encoded_transaction: bytes) -> Union[EthTransaction, SignedEthTransaction]:
+
         if not isinstance(encoded_transaction, bytes):
             raise ValueError("Encoded transaction must be of type bytes")
 
@@ -69,10 +70,10 @@ class EthConnect():
 
         try:
             transaction = rlp.decode(rlp_encoded_transaction, EthTransaction)
-        except:
+        except rlp.exceptions.DeserializationError:
             try:
                 transaction = rlp.decode(rlp_encoded_transaction, SignedEthTransaction)
-            except:
+            except rlp.exceptions.DeserializationError:
                 raise ValueError("Failed to deserialize the encoded transaction")
 
         return transaction

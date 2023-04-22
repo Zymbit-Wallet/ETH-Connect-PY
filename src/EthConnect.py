@@ -42,32 +42,26 @@ class EthConnect():
     @staticmethod
     def create_eth_contract_transaction(chain_id: int = 1, nonce: int = 0, max_priority_fee_per_gas: int = 1, 
                                max_fee_per_gas: int = 10, gas: int = 21000, contract_address: str = None, 
-                               value: int = 0, access_list: list = [], contract_bytecode_path: str = None,
-                               contract_abi_path: str = None, function_name: str = None, args: list = {}) -> EthTransaction:
+                               value: int = 0, access_list: list = [], contract_abi_path: str = None, 
+                               function_name: str = None, args: list = {}) -> EthTransaction:
 
         if not isinstance(chain_id, int) or not isinstance(nonce, int) or not isinstance(max_priority_fee_per_gas, int) \
             or not isinstance(max_fee_per_gas, int) or not isinstance(gas, int) or not isinstance(contract_address, str) \
             or not isinstance(value, int) or not isinstance(access_list, list) or not isinstance(args, list)\
-            or not isinstance(contract_bytecode_path, str) or not isinstance(function_name, str) or not isinstance(contract_abi_path, str): 
+            or not isinstance(function_name, str) or not isinstance(contract_abi_path, str): 
             raise ValueError("One or more parameter types are invalid")
         
         if not Web3.isChecksumAddress(contract_address):
             raise ValueError("'contract_address' field is not a valid checksum address")
         
-        if not os.path.exists(contract_bytecode_path):
-            raise ValueError(f"Bytecode file path '{contract_bytecode_path}' does not exist.")
-        
         if not os.path.exists(contract_abi_path):
             raise ValueError(f"ABI file path '{contract_abi_path}' does not exist.")
-
-        with open(contract_bytecode_path, 'r') as f:
-            bytecode = f.read()
 
         with open(contract_abi_path, 'r') as f:
             abi = json.load(f)
 
         web3 = Web3()
-        contract = web3.eth.contract(abi=abi, bytecode=bytecode, address=contract_address)
+        contract = web3.eth.contract(abi=abi, address=contract_address)
         data = contract.encodeABI(fn_name=function_name, args=args)
 
         transaction = EthTransaction(
@@ -83,8 +77,6 @@ class EthConnect():
         )
 
         return transaction
-        
-
     
     @staticmethod
     def sign_eth_transaction(transaction: EthTransaction, keyring: ZymbitEthKeyring, address: str = None, slot: int = None, path: int = None) -> SignedEthTransaction:

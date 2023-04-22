@@ -10,6 +10,8 @@ from eth_account import Account
 import zymkey
 
 
+
+
 options = {
     "wallet_name": "MyExampleWallet"
 }
@@ -39,7 +41,7 @@ concat = EthConnect.concatenate_eth_sig(sig[0], sig[1], sig[2])
 print(message)
 print(concat)
 
-contractTxns = EthConnect.create_eth_contract_transaction(contract_address=keyring.get_accounts()[1].address, value=EthConnect.eth_to_wei(0.00001), contract_abi_path='./ABI.json', contract_bytecode_path='./bytecode.txt', function_name='postData', args=['hi', 'hi2', 12133, '0x1223', '0xa6e23'])
+contractTxns = EthConnect.create_eth_contract_transaction(contract_address=keyring.get_accounts()[1].address, value=EthConnect.eth_to_wei(0.00001), contract_abi_path='./ABI.json', function_name='postData', args=['hi', 'hi2', 12133, '0x1223', '0xa6e23'])
 print(contractTxns)
 
 # transaction_result_hash = w3.eth.send_raw_transaction(serialized)

@@ -62,7 +62,7 @@ class ZymbitEthKeyring(Keyring):
                 if path == ZymbitEthKeyring.BASE_PATH:
                     self.base_slot = slot
                 elif (ZymbitEthKeyring.BASE_PATH + "/") in path and master_slot == self.master_slot:
-                    self.accounts.append(EthAccount(path, ZymbitEthKeyring._generate_eth_address(slot), slot))
+                    self.accounts.append(EthAccount(path, ZymbitEthKeyring.generate_eth_address(slot), slot))
                 elif path in ZymbitEthKeyring.BASE_PATH and len(path) > len(deepest_path["path"]):
                     deepest_path = {"path": path, "slot": slot}
 
@@ -75,11 +75,11 @@ class ZymbitEthKeyring(Keyring):
         if (not isinstance(index, int) or index < 0):
             raise ValueError("Invalid index")
 
-        if (self._account_exists(index)):
+        if (self.account_exists(index)):
             raise ValueError("Account already in keyring")
 
         slot = zymkey.client.gen_wallet_child_key(self.base_slot, index, False)
-        new_account = EthAccount(ZymbitEthKeyring.BASE_PATH + "/" + str(index), ZymbitEthKeyring._generate_eth_address(slot), slot)
+        new_account = EthAccount(ZymbitEthKeyring.BASE_PATH + "/" + str(index), ZymbitEthKeyring.generate_eth_address(slot), slot)
         self.accounts.append(new_account)
         return new_account
 
@@ -92,7 +92,7 @@ class ZymbitEthKeyring(Keyring):
         for i in range(n):
             new_account_index = self._find_next_account_index()
             slot = zymkey.client.gen_wallet_child_key(self.base_slot, new_account_index, False)
-            new_account = EthAccount(ZymbitEthKeyring.BASE_PATH + "/" + str(new_account_index), ZymbitEthKeyring._generate_eth_address(slot), slot)
+            new_account = EthAccount(ZymbitEthKeyring.BASE_PATH + "/" + str(new_account_index), ZymbitEthKeyring.generate_eth_address(slot), slot)
             new_accounts.append(new_account)
             self.accounts.append(new_account)
 
@@ -107,12 +107,12 @@ class ZymbitEthKeyring(Keyring):
             return new_accounts
 
         for index in index_list:
-            if (self._account_exists(index)):
+            if (self.account_exists(index)):
                 raise ValueError("account with index " + str(index) + " already in keyring")
 
         for index in index_list:
             slot = zymkey.client.gen_wallet_child_key(self.base_slot, index, False)
-            new_account = EthAccount(ZymbitEthKeyring.BASE_PATH + "/" + str(index), ZymbitEthKeyring._generate_eth_address(slot), slot)
+            new_account = EthAccount(ZymbitEthKeyring.BASE_PATH + "/" + str(index), ZymbitEthKeyring.generate_eth_address(slot), slot)
             new_accounts.append(new_account)
             self.accounts.append(new_account)
 
@@ -153,7 +153,7 @@ class ZymbitEthKeyring(Keyring):
                 keccak_digest = keccak.new(digest_bits=256)
                 keccak_digest.update(encoded_transaction)
                 (signature, raw_y_parity) = zymkey.client.sign_digest(keccak_digest, account.slot, return_recid=True)
-                (y_parity, v, r, s) = self._gen_valid_eth_sig(signature, raw_y_parity, transaction.chain_id)
+                (y_parity, v, r, s) = self.gen_valid_eth_sig(signature, raw_y_parity, transaction.chain_id)
                 signedTransaction = SignedEthTransaction(
                     chain_id = transaction.chain_id,
                     nonce = transaction.nonce,
@@ -177,7 +177,7 @@ class ZymbitEthKeyring(Keyring):
         if not isinstance(message, (SHA256.SHA256Hash, keccak.Keccak_Hash)):
             raise TypeError("The message must be an instance of either SHA256.SHA256Hash or keccak.Keccak_Hash Crypto.Hash object.")
 
-        if (not ZymbitEthKeyring._is_valid_hash(ZymbitEthKeyring._digest_to_hex(message))):
+        if (not ZymbitEthKeyring.is_valid_hash(ZymbitEthKeyring.digest_to_hex(message))):
             raise ValueError("Message is required to be a valid 256 bit digest in hex format")
         
         if (not (slot or address or path)):
@@ -186,7 +186,7 @@ class ZymbitEthKeyring(Keyring):
         for account in self.accounts:
             if (account.address == address or account.slot == slot or account.path == path):
                 (signature, raw_y_parity) = zymkey.client.sign_digest(message, account.slot, return_recid=True)
-                (y_parity, v, r, s) = ZymbitEthKeyring._gen_valid_eth_sig(signature, raw_y_parity, 0)
+                (y_parity, v, r, s) = ZymbitEthKeyring.gen_valid_eth_sig(signature, raw_y_parity, 0)
                 return (v, r, s)
             
         raise ValueError("Account does not exist in keyring") 
@@ -216,19 +216,19 @@ class ZymbitEthKeyring(Keyring):
         return next_account_index
     
     @staticmethod
-    def _generate_eth_address(slot: int) -> str:
+    def generate_eth_address(slot: int) -> str:
         public_key = zymkey.client.get_public_key(slot)
         keccak_hash = Web3.keccak(bytes(public_key)).hex()
         return Web3.toChecksumAddress(keccak_hash[-40:])
 
-    def _account_exists(self, index: int):
+    def account_exists(self, index: int):
         for account in self.accounts:
             if (account.path == ZymbitEthKeyring.BASE_PATH + "/" + str(index)):
                 return True
         return False
     
     @staticmethod
-    def _digest_to_hex(digest: Union[SHA256.SHA256Hash, keccak.Keccak_Hash]) -> str:
+    def digest_to_hex(digest: Union[SHA256.SHA256Hash, keccak.Keccak_Hash]) -> str:
 
         if not isinstance(digest, (SHA256.SHA256Hash, keccak.Keccak_Hash)):
             raise TypeError("The digest must be an instance of either SHA256.SHA256Hash or keccak.Keccak_Hash Crypto.Hash object.")
@@ -236,7 +236,7 @@ class ZymbitEthKeyring(Keyring):
         return "0x" + digest.hexdigest()
     
     @staticmethod
-    def _gen_valid_eth_sig(signature: bytearray, y_parity: int, chain_id: int = 1) -> tuple[bool, int, int, int]:
+    def gen_valid_eth_sig(signature: bytearray, y_parity: int, chain_id: int = 1) -> tuple[bool, int, int, int]:
             N = 115792089237316195423570985008687907852837564279074904382605163141518161494337
             r = int.from_bytes(signature[:32], "big")
             s = int.from_bytes(signature[-32:], "big")
@@ -254,7 +254,7 @@ class ZymbitEthKeyring(Keyring):
             return (y_parity, v, r, s)
     
     @staticmethod
-    def _is_valid_hash(hex_hash: str) -> bool:
+    def is_valid_hash(hex_hash: str) -> bool:
         if re.match("^(0x)?[0-9a-fA-F]{64}$", hex_hash):
             return True
         return False

@@ -101,7 +101,7 @@ class EthConnect():
         if not isinstance(message, (SHA256.SHA256Hash, keccak.Keccak_Hash)):
             raise TypeError("The message must be an instance of either SHA256.SHA256Hash or keccak.Keccak_Hash Crypto.Hash object.")
 
-        if (not ZymbitEthKeyring._is_valid_hash(ZymbitEthKeyring._digest_to_hex(message))):
+        if (not ZymbitEthKeyring.is_valid_hash(ZymbitEthKeyring.digest_to_hex(message))):
             raise ValueError("Message is required to be a valid 256 bit digest in hex format")
         
         if (not isinstance(keyring, ZymbitEthKeyring)):

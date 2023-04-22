@@ -182,6 +182,7 @@ class ZymbitEthKeyring(Keyring):
         
         if (not (slot or address or path)):
             raise ValueError("Valid address, slot, or path required")
+
         for account in self.accounts:
             if (account.address == address or account.slot == slot or account.path == path):
                 (signature, raw_y_parity) = zymkey.client.sign_digest(message, account.slot, return_recid=True)
@@ -230,7 +231,7 @@ class ZymbitEthKeyring(Keyring):
     def _digest_to_hex(digest: Union[SHA256.SHA256Hash, keccak.Keccak_Hash]) -> str:
 
         if not isinstance(digest, (SHA256.SHA256Hash, keccak.Keccak_Hash)):
-            raise TypeError("The message must be an instance of either SHA256.SHA256Hash or keccak.Keccak_Hash Crypto.Hash object.")
+            raise TypeError("The digest must be an instance of either SHA256.SHA256Hash or keccak.Keccak_Hash Crypto.Hash object.")
         
         return "0x" + digest.hexdigest()
     

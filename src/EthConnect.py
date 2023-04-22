@@ -7,7 +7,6 @@ import binascii
 import rlp
 from typing import Union
 from Crypto.Hash import keccak, SHA256
-import hashlib
 
 class EthConnect():
     
@@ -83,7 +82,20 @@ class EthConnect():
                 raise ValueError("Failed to deserialize the encoded transaction")
 
         return transaction
+    
+    @staticmethod
+    def create_eth_message(message: str) -> tuple[str, bytes]:
 
+        if (not isinstance(message, str)):
+            raise ValueError("Message must be a string")
+        
+        eth_prefix = f"Ethereum Signed Message:\n{len(message)}"
+        eth_message = eth_prefix + message
+        eth_message_bytes = eth_message.encode("utf-8")
+
+        return (eth_message, eth_message_bytes)
+
+    @staticmethod
     def sign_message(message: Union[SHA256.SHA256Hash, keccak.Keccak_Hash], keyring: ZymbitEthKeyring, address: str = None, slot: int = None, path: int = None) -> tuple[int, int, int]:
 
         if not isinstance(message, (SHA256.SHA256Hash, keccak.Keccak_Hash)):
@@ -113,16 +125,11 @@ class EthConnect():
         if s < 1 or s >= N:
             raise ValueError("Invalid s value. Must be between 1 and N - 1.")
 
-        v_bytes = v.to_bytes(1, byteorder='big')
-        r_bytes = r.to_bytes(32, byteorder='big')
-        s_bytes = s.to_bytes(32, byteorder='big')
-
-        concatenated_sig = v_bytes + r_bytes + s_bytes
-        return "0x" + concatenated_sig.hex()
+        return "0x" + hex(r)[2:].zfill(64) + hex(s)[2:].zfill(64) + hex(v)[2:].zfill(2)
         
     
     @staticmethod
-    def keccak256(str_data: str = None, bytes_data: bytes = None) -> str:
+    def keccak256(str_data: str = None, bytes_data: bytes = None) -> keccak.Keccak_Hash:
 
         if str_data is not None and bytes_data is not None:
             raise ValueError("Both str_data and bytes_data should not be provided at the same time.")
@@ -140,7 +147,7 @@ class EthConnect():
         return keccak_hash
     
     @staticmethod
-    def sha256(str_data: str = None, bytes_data: bytes = None) -> str:
+    def sha256(str_data: str = None, bytes_data: bytes = None) -> SHA256.SHA256Hash:
         if str_data is not None and bytes_data is not None:
             raise ValueError("Both str_data and bytes_data should not be provided at the same time.")
 

@@ -43,7 +43,7 @@ class EthConnect():
     def create_eth_contract_transaction(chain_id: int = 1, nonce: int = 0, max_priority_fee_per_gas: int = 1, 
                                max_fee_per_gas: int = 10, gas: int = 21000, contract_address: str = None, 
                                value: int = 0, access_list: list = [], contract_abi_path: str = None, 
-                               function_name: str = None, args: list = {}) -> EthTransaction:
+                               function_name: str = None, args: list = []) -> EthTransaction:
 
         if not isinstance(chain_id, int) or not isinstance(nonce, int) or not isinstance(max_priority_fee_per_gas, int) \
             or not isinstance(max_fee_per_gas, int) or not isinstance(gas, int) or not isinstance(contract_address, str) \
@@ -70,9 +70,9 @@ class EthConnect():
             max_priority_fee_per_gas=max_priority_fee_per_gas,
             max_fee_per_gas=max_fee_per_gas,
             gas=gas,
-            to=contract_address,
+            to=binascii.unhexlify(contract_address[2:]),  # Convert the address to bytes
             value=value,
-            data=data,
+            data=binascii.unhexlify(data.replace('0x', '')),  # Convert the data to bytes
             access_list=access_list
         )
 

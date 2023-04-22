@@ -33,12 +33,14 @@ deserialized = EthConnect.rlp_deserialize_transaction(serialized)
 
 print(deserialized)
 
-message = EthConnect.create_eth_message('shiv')[0]
-sig = EthConnect.sign_message(EthConnect.keccak256(message), keyring, '0x93D458d6B14A02943A07708a24D8A9F142Fc5A00')
+message = EthConnect.create_eth_message('shiv')
+sig = EthConnect.sign_message(EthConnect.keccak256(message[0]), keyring, '0x93D458d6B14A02943A07708a24D8A9F142Fc5A00')
 concat = EthConnect.concatenate_eth_sig(sig[0], sig[1], sig[2])
 print(message)
 print(concat)
 
+contractTxns = EthConnect.create_eth_contract_transaction(contract_address=keyring.get_accounts()[1].address, value=EthConnect.eth_to_wei(0.00001), contract_abi_path='./ABI.json', contract_bytecode_path='./bytecode.txt', function_name='postData', args=['hi', 'hi2', 12133, '0x1223', '0xa6e23'])
+print(contractTxns)
 
 # transaction_result_hash = w3.eth.send_raw_transaction(serialized)
 # print("Transaction broadcast hash:\n%s" %

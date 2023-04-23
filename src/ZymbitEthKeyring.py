@@ -149,7 +149,7 @@ class ZymbitEthKeyring(Keyring):
         
         for account in self.accounts:
             if (account.address == address or account.slot == slot or account.path == path):
-                encoded_transaction = bytes([2]) + rlp.encode(transaction)
+                encoded_transaction = bytes([transaction.transaction_type]) + rlp.encode(transaction)
                 keccak_digest = keccak.new(digest_bits=256)
                 keccak_digest.update(encoded_transaction)
                 (signature, raw_y_parity) = zymkey.client.sign_digest(keccak_digest, account.slot, return_recid=True)

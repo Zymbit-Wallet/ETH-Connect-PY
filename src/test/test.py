@@ -11,7 +11,6 @@ import zymkey
 
 
 
-
 options = {
     "wallet_name": "MyExampleWallet"
 }

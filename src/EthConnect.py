@@ -140,7 +140,7 @@ class EthConnect():
         if (not (isinstance(transaction, EthTransaction) or isinstance(transaction, SignedEthTransaction))):
             raise ValueError("Transaction has to be of type EthTransaction or SignedEthTransaction")
 
-        encoded_transaction = bytes([2]) + rlp.encode(transaction)
+        encoded_transaction = bytes([transaction.transaction_type]) + rlp.encode(transaction)
         return encoded_transaction
 
     @staticmethod

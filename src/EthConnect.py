@@ -83,7 +83,7 @@ class EthConnect():
 
     @staticmethod
     def create_execute_contract_transaction(chain_id: int = 1, nonce: int = 0, max_priority_fee_per_gas: int = 1, 
-                               max_fee_per_gas: int = 10, gas: int = 21000, contract_address: str = None, 
+                               max_fee_per_gas: int = 10, gas: int = 210000, contract_address: str = None, 
                                value: int = 0, access_list: list = [], contract_abi_path: str = None, 
                                function_name: str = None, args: list = []) -> EthTransaction:
 

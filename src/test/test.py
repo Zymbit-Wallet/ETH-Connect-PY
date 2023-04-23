@@ -39,7 +39,7 @@ concat = EthConnect.concatenate_sig(sig[0], sig[1], sig[2])
 print(message)
 print(concat)
 
-contractTxn = EthConnect.create_deploy_contract_transaction(chain_id=11155111, nonce=3, gas=2100000, max_fee_per_gas=w3.toWei(190, 'gwei'), max_priority_fee_per_gas=w3.toWei(50, 'gwei'), contract_abi_path='./ABI.json', constructor_args=['0x' + ('0'*64), keyring.get_accounts()[0].address], contract_bytecode_path='./bytecode.txt')
+contractTxn = EthConnect.create_execute_contract_transaction(chain_id=11155111, nonce=4, contract_abi_path='./ABI.json', args=['hi','hi1', 1000000, '0x'+('0'*64), '0x' + ('0'*130)], function_name="postData", contract_address = '0x6FCc62196FD8C0f1a92817312c109D438cC0acC9')
 print(contractTxn)
 
 signedContractTxn = EthConnect.sign_transaction(contractTxn, keyring1, slot=30)

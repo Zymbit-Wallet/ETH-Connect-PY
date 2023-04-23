@@ -208,7 +208,7 @@ class EthConnect():
         if s < 1 or s >= N:
             raise ValueError("Invalid s value. Must be between 1 and N - 1.")
 
-        return "0x" + hex(r)[2:].zfill(64) + hex(s)[2:].zfill(64) + hex(v)[2:].zfill(2)
+        return "0x" + hex(r)[2:].zfill(64) + hex(s)[2:].zfill(64) + hex(v)[2:]
         
     
     @staticmethod

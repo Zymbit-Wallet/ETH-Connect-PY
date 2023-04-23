@@ -186,7 +186,7 @@ class ZymbitEthKeyring(Keyring):
         for account in self.accounts:
             if (account.address == address or account.slot == slot or account.path == path):
                 (signature, raw_y_parity) = zymkey.client.sign_digest(message, account.slot, return_recid=True)
-                (y_parity, v, r, s) = ZymbitEthKeyring.gen_valid_eth_sig(signature, raw_y_parity, 0)
+                (y_parity, v, r, s) = ZymbitEthKeyring.gen_valid_eth_sig(signature, raw_y_parity)
                 return (v, r, s)
             
         raise ValueError("Account does not exist in keyring") 
@@ -236,7 +236,7 @@ class ZymbitEthKeyring(Keyring):
         return "0x" + digest.hexdigest()
     
     @staticmethod
-    def gen_valid_eth_sig(signature: bytearray, y_parity: int, chain_id: int = 1) -> tuple[bool, int, int, int]:
+    def gen_valid_eth_sig(signature: bytearray, y_parity: int, chain_id: int = 0) -> tuple[bool, int, int, int]:
             N = 115792089237316195423570985008687907852837564279074904382605163141518161494337
             r = int.from_bytes(signature[:32], "big")
             s = int.from_bytes(signature[-32:], "big")

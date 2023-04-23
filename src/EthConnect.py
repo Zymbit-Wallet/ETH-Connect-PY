@@ -13,7 +13,7 @@ import json
 class EthConnect():
     
     @staticmethod
-    def create_eth_transaction(chain_id: int = 1, nonce: int = 0, max_priority_fee_per_gas: int = 1, 
+    def create_transaction(chain_id: int = 1, nonce: int = 0, max_priority_fee_per_gas: int = 1, 
                                max_fee_per_gas: int = 10, gas: int = 21000, to: str = None, 
                                value: int = 0, data: str = "0x", access_list: list = []) -> EthTransaction:
 
@@ -33,14 +33,56 @@ class EthConnect():
             gas = gas,
             to = binascii.unhexlify(to[2:]),
             value = value,
-            data = binascii.unhexlify(data.replace('0x', '')),
+            data = binascii.unhexlify(data[2:]),
             access_list = access_list
         )
 
         return transaction
     
     @staticmethod
-    def create_eth_contract_transaction(chain_id: int = 1, nonce: int = 0, max_priority_fee_per_gas: int = 1, 
+    def create_deploy_contract_transaction(chain_id: int = 1, nonce: int = 0, max_priority_fee_per_gas: int = 1,
+                                            max_fee_per_gas: int = 10, gas: int = 21000, value: int = 0,
+                                            access_list: list = [], contract_bytecode_path: str = None, contract_abi_path: str = None,
+                                            constructor_args: list = []) -> EthTransaction:
+
+        if not isinstance(chain_id, int) or not isinstance(nonce, int) or not isinstance(max_priority_fee_per_gas, int) \
+                or not isinstance(max_fee_per_gas, int) or not isinstance(gas, int) or not isinstance(value, int) \
+                or not isinstance(access_list, list) or not isinstance(contract_bytecode_path, str) or not isinstance(contract_abi_path, str) \
+                or not isinstance(constructor_args, list):
+            raise ValueError("One or more parameter types are invalid")
+
+        if not os.path.exists(contract_bytecode_path):
+            raise ValueError(f"Bytecode file path '{contract_bytecode_path}' does not exist.")
+
+        if not os.path.exists(contract_abi_path):
+            raise ValueError(f"ABI file path '{contract_abi_path}' does not exist.")
+
+        with open(contract_bytecode_path, 'r') as bytecode_file:
+            bytecode = bytecode_file.read()
+
+        with open(contract_abi_path, 'r') as abi_file:
+            abi = json.load(abi_file)
+
+        web3 = Web3()
+        contract = web3.eth.contract(abi=abi, bytecode=bytecode)
+        data = binascii.unhexlify(contract.constructor(*constructor_args).data_in_transaction[2:])
+
+        transaction = EthTransaction(
+            chain_id=chain_id,
+            nonce=nonce,
+            max_priority_fee_per_gas=max_priority_fee_per_gas,
+            max_fee_per_gas=max_fee_per_gas,
+            gas=gas,
+            to=b'',
+            value=value,
+            data=data,
+            access_list=access_list
+        )
+
+        return transaction
+
+    @staticmethod
+    def create_execute_contract_transaction(chain_id: int = 1, nonce: int = 0, max_priority_fee_per_gas: int = 1, 
                                max_fee_per_gas: int = 10, gas: int = 21000, contract_address: str = None, 
                                value: int = 0, access_list: list = [], contract_abi_path: str = None, 
                                function_name: str = None, args: list = []) -> EthTransaction:
@@ -72,14 +114,14 @@ class EthConnect():
             gas=gas,
             to=binascii.unhexlify(contract_address[2:]),  # Convert the address to bytes
             value=value,
-            data=binascii.unhexlify(data.replace('0x', '')),  # Convert the data to bytes
+            data=binascii.unhexlify(data[2:]),  # Convert the data to bytes
             access_list=access_list
         )
 
         return transaction
     
     @staticmethod
-    def sign_eth_transaction(transaction: EthTransaction, keyring: ZymbitEthKeyring, address: str = None, slot: int = None, path: int = None) -> SignedEthTransaction:
+    def sign_transaction(transaction: EthTransaction, keyring: ZymbitEthKeyring, address: str = None, slot: int = None, path: int = None) -> SignedEthTransaction:
 
         if (not isinstance(transaction, EthTransaction)):
             raise ValueError("Transaction is required to be of type EthTransaction")
@@ -125,7 +167,7 @@ class EthConnect():
         return transaction
     
     @staticmethod
-    def create_eth_message(message: str) -> tuple[str, bytes]:
+    def create_message(message: str) -> tuple[str, bytes]:
 
         if (not isinstance(message, str)):
             raise ValueError("Message must be a string")
@@ -154,7 +196,7 @@ class EthConnect():
         return keyring.sign_message(message, address, slot, path)
     
     @staticmethod
-    def concatenate_eth_sig(v: int, r: int, s: int) -> str:
+    def concatenate_sig(v: int, r: int, s: int) -> str:
         if not (v in (27, 28) or (v >= 35 and v % 2 == 1)):
             raise ValueError("Invalid v value.")
         

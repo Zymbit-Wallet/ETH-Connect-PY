@@ -9,8 +9,13 @@ from typing import Union
 from Crypto.Hash import keccak, SHA256
 import os
 import json
+import re
+
 
 class EthConnect():
+
+    ZYMBIT_ENS: str = "zymbit.eth"
+    ZYMBIT_ENS_ADDRESS: str = "0xBBed8c07443eE019C7508160BfA8b5D682cA76DC"
     
     @staticmethod
     def create_transaction(chain_id: int = 1, nonce: int = 0, max_priority_fee_per_gas: int = 1, 
@@ -41,15 +46,29 @@ class EthConnect():
     
     @staticmethod
     def create_deploy_contract_transaction(chain_id: int = 1, nonce: int = 0, max_priority_fee_per_gas: int = 1,
-                                            max_fee_per_gas: int = 10, gas: int = 21000, value: int = 0,
+                                            max_fee_per_gas: int = 10, gas: int = 210000, from_address: str = None, value: int = 0,
                                             access_list: list = [], contract_bytecode_path: str = None, contract_abi_path: str = None,
-                                            constructor_args: list = []) -> EthTransaction:
+                                            constructor_args: list = [], deployment_method: str = "CREATE", salt: str = None, deployer_address: str = None) -> EthTransaction:
 
         if not isinstance(chain_id, int) or not isinstance(nonce, int) or not isinstance(max_priority_fee_per_gas, int) \
                 or not isinstance(max_fee_per_gas, int) or not isinstance(gas, int) or not isinstance(value, int) \
-                or not isinstance(access_list, list) or not isinstance(contract_bytecode_path, str) or not isinstance(contract_abi_path, str) \
-                or not isinstance(constructor_args, list):
+                or not isinstance(access_list, list) or not isinstance(contract_bytecode_path, str) \
+                or not isinstance(contract_abi_path, str) or not isinstance(constructor_args, list):
             raise ValueError("One or more parameter types are invalid")
+        
+        if deployment_method not in ["CREATE", "CREATE2"]:
+            raise ValueError("Invalid deployment_method. Must be 'CREATE' or 'CREATE2'")
+        
+        if deployment_method == "CREATE2":
+            if salt is None:
+                raise ValueError("Salt is required for CREATE2 deployment_method")
+            
+            salt_hex = salt.encode().hex()
+            if len(salt_hex) < 4 or len(salt_hex) > 64:
+                raise ValueError("Salt must be at least 2 bytes (4 hex characters) and at most 32 bytes (64 hex characters)")
+            
+            if not Web3.isChecksumAddress(deployer_address):
+                raise ValueError("'deployer_address' field is not a valid checksum address")
 
         if not os.path.exists(contract_bytecode_path):
             raise ValueError(f"Bytecode file path '{contract_bytecode_path}' does not exist.")
@@ -65,7 +84,15 @@ class EthConnect():
 
         web3 = Web3()
         contract = web3.eth.contract(abi=abi, bytecode=bytecode)
-        data = binascii.unhexlify(contract.constructor(*constructor_args).data_in_transaction[2:])
+        constructor_data = contract.constructor(*constructor_args).data_in_transaction
+
+        if deployment_method == "CREATE":
+            data = constructor_data
+        elif deployment_method == "CREATE2":
+            salt_hex = salt.encode().hex()
+            contract_address = EthConnect.create2_address(deployer_address, "0x"+salt_hex, bytecode)
+            print(contract_address)
+            data = constructor_data + deployer_address[2:].rjust(64, '0') + salt_hex.rjust(64, '0')
 
         transaction = EthTransaction(
             chain_id=chain_id,
@@ -75,7 +102,7 @@ class EthConnect():
             gas=gas,
             to=b'',
             value=value,
-            data=data,
+            data=binascii.unhexlify(data[2:]),
             access_list=access_list
         )
 
@@ -83,7 +110,7 @@ class EthConnect():
 
     @staticmethod
     def create_execute_contract_transaction(chain_id: int = 1, nonce: int = 0, max_priority_fee_per_gas: int = 1, 
-                               max_fee_per_gas: int = 10, gas: int = 210000, contract_address: str = None, 
+                               max_fee_per_gas: int = 10, gas: int = 21000, contract_address: str = None, 
                                value: int = 0, access_list: list = [], contract_abi_path: str = None, 
                                function_name: str = None, args: list = []) -> EthTransaction:
 
@@ -112,9 +139,9 @@ class EthConnect():
             max_priority_fee_per_gas=max_priority_fee_per_gas,
             max_fee_per_gas=max_fee_per_gas,
             gas=gas,
-            to=binascii.unhexlify(contract_address[2:]),  # Convert the address to bytes
+            to=binascii.unhexlify(contract_address[2:]), 
             value=value,
-            data=binascii.unhexlify(data[2:]),  # Convert the data to bytes
+            data=binascii.unhexlify(data[2:]), 
             access_list=access_list
         )
 
@@ -246,8 +273,29 @@ class EthConnect():
         sha256_hash.update(data)
 
         return sha256_hash
-    
+
+  
+    @staticmethod  
+    def create2_address(deployer_address: str, salt: str, init_code: str) -> str:
+        if not Web3.isChecksumAddress(deployer_address):
+            raise ValueError("Invalid deployer_address. Must be a valid checksum address.")
+        if not EthConnect.is_hex(salt) or (len(salt) < 4 or len(salt) > 64):
+            raise ValueError("Invalid salt. Must be a hex string with 0x prefix between 2 and 32 bytes.")
+        if not EthConnect.is_hex(init_code):
+            raise ValueError("Invalid init_code. Must be a hex string with 0x prefix.")
+        
+        def keccak256(data):
+            keccak_hash = keccak.new(digest_bits=256)
+            keccak_hash.update(data)
+            return keccak_hash.digest()
+
+        return Web3.toChecksumAddress('0x' + keccak256(b'\xff' + bytes.fromhex(deployer_address[2:]) + bytes.fromhex(salt[2:]) + keccak256(bytes.fromhex(init_code[2:]))).hex()[-40:])
 
     @staticmethod
     def eth_to_wei(ether_amount: float = 0) -> int:
         return Web3.toWei(number = ether_amount, unit = "ether")
+    
+    @staticmethod
+    def is_hex(string):
+        hex_pattern = re.compile(r"^0x[0-9a-fA-F]+$")
+        return bool(hex_pattern.match(string))

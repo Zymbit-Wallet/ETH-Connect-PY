@@ -1,5 +1,6 @@
 from Keyring import Keyring
 from typing import Type
+from time import sleep
 import zymkey
 
 class ZymbitKeyringManager:
@@ -34,7 +35,7 @@ class ZymbitKeyringManager:
             keyring: keyring_class = keyring_class(options)
             self.keyrings.append(keyring)
             return master_key
-        except:
+        except Exception as e:
             if master_key_slot:
                 zymkey.client.remove_key(master_key_slot)
 
@@ -60,20 +61,25 @@ class ZymbitKeyringManager:
         return self.keyrings
     
     def remove_keyring(self, wallet_name: str = None, master_slot: int = None, remove_master: bool = False) -> bool:
-        if not (wallet_name or master_slot):
-            raise ValueError("wallet_name or master_slot are required")
+        if not (wallet_name or master_slot) or (wallet_name and master_slot):
+            raise ValueError("1 of wallet_name or master_slot are required")
         
         for keyring in self.keyrings:
             if keyring.wallet_name == wallet_name or keyring.master_slot == master_slot:
+                self.keyrings.remove(keyring)
                 slots: list[int] = zymkey.client.get_slot_alloc_list()[0]
                 slots = list(filter(lambda slot: slot > 15, slots))
+                slots.reverse()
                 for slot in slots:
                     (path, curr_wallet_name, curr_master_slot) = zymkey.client.get_wallet_node_addr(slot)
                     if wallet_name == curr_wallet_name or master_slot == curr_master_slot:
-                        if (path == 'm' and not remove_master):
+                        if (path == "m"):
+                            master_slot = slot
                             continue
                         else:
                             zymkey.client.remove_key(slot)
+                if remove_master:
+                    zymkey.client.remove_key(master_slot)
                 return True
 
         return False

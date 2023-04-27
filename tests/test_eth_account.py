@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock
 import sys
-sys.path.append('../src')
+sys.path.append('../src/ethconnect')
 from Account import Account
 from EthAccount import EthAccount
 import zymkey

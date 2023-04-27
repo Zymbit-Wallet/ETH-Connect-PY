@@ -1,9 +1,9 @@
 import unittest
-from Keyring import Keyring
 from typing import Type
 import zymkey
 import sys
-sys.path.append('../src')
+sys.path.append('../src/ethconnect')
+from Keyring import Keyring
 from ZymbitEthKeyring import ZymbitEthKeyring
 from ZymbitKeyringManager import ZymbitKeyringManager
 

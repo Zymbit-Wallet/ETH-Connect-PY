@@ -1,4 +1,4 @@
-from Account import Account
+from .Account import Account
 import zymkey
 import binascii
 from web3 import Web3

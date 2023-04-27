@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from EllipticCurve import EllipticCurve
+from .EllipticCurve import EllipticCurve
 from typing import Type
-from Account import Account
+from .Account import Account
 import re
 
 class Keyring(ABC):

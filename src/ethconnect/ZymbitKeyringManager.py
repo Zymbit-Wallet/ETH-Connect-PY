@@ -1,4 +1,4 @@
-from Keyring import Keyring
+from .Keyring import Keyring
 from typing import Type
 from time import sleep
 import zymkey

@@ -1,6 +1,5 @@
-from ZymbitEthKeyring import ZymbitEthKeyring
-from EthAccount import EthAccount
-from EthTransaction import EthTransaction, SignedEthTransaction
+from .ZymbitEthKeyring import ZymbitEthKeyring
+from .EthTransaction import EthTransaction, SignedEthTransaction
 import zymkey
 from web3 import Web3
 import binascii

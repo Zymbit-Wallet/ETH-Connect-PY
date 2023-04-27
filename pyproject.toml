@@ -3,8 +3,8 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "eth-connect"
-version = "1.0.0"
+name = "ethconnect"
+version = "1.0.5"
 authors = [
   { name="Shivaansh Kapoor", email="shiv@zymbit.com" },
 ]

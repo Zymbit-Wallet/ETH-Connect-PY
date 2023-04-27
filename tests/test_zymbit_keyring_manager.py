@@ -3,7 +3,7 @@ from Keyring import Keyring
 from typing import Type
 import zymkey
 import sys
-sys.path.append('../')
+sys.path.append('../src')
 from ZymbitEthKeyring import ZymbitEthKeyring
 from ZymbitKeyringManager import ZymbitKeyringManager
 

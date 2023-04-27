@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import sys
 import zymkey
 import time
-sys.path.append('../')
+sys.path.append('../src')
 from EthConnect import EthConnect
 from EthTransaction import EthTransaction, SignedEthTransaction
 from ZymbitEthKeyring import ZymbitEthKeyring

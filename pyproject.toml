@@ -8,7 +8,7 @@ version = "1.0.5"
 authors = [
   { name="Shivaansh Kapoor", email="shiv@zymbit.com" },
 ]
-description = "ETH-Connect Python API"
+description = "ETH-Connect Python SDK"
 readme = "README.md"
 requires-python = ">=3.7"
 classifiers = [

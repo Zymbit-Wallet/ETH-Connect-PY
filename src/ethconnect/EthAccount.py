@@ -10,6 +10,9 @@ class EthAccount(Account):
         self.address = address
         self.slot = slot
 
+        if not self.is_valid_account():
+            raise ValueError("Must provide a valid path, address, and slot")
+
     def serialize(self) -> dict:
         return {
             "path": self.path,

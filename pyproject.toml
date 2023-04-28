@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ethconnect"
-version = "1.0.6"
+version = "1.1.0"
 authors = [
   { name="Shivaansh Kapoor", email="shiv@zymbit.com" },
 ]

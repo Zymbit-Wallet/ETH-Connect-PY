@@ -1,9 +1,7 @@
 import unittest
 from unittest.mock import MagicMock
 import sys
-sys.path.append('../src/ethconnect')
-from Account import Account
-from EthAccount import EthAccount
+from ethconnect import Account, EthAccount
 import zymkey
 import binascii
 from web3 import Web3

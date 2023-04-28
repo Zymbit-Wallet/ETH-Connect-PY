@@ -4,12 +4,7 @@ from Crypto.Hash import SHA256, keccak
 from typing import List
 import sys
 import zymkey
-sys.path.append('../src/ethconnect')
-from Keyring import Keyring
-from EthAccount import EthAccount
-from EllipticCurve import EllipticCurve
-from EthTransaction import EthTransaction, SignedEthTransaction
-from ZymbitEthKeyring import ZymbitEthKeyring
+from ethconnect import Keyring, EthAccount, EllipticCurve, EthTransaction, SignedEthTransaction, ZymbitEthKeyring
 
 
 class TestZymbitEthKeyring(unittest.TestCase):

@@ -2,10 +2,7 @@ import unittest
 from typing import Type
 import zymkey
 import sys
-sys.path.append('../src/ethconnect')
-from Keyring import Keyring
-from ZymbitEthKeyring import ZymbitEthKeyring
-from ZymbitKeyringManager import ZymbitKeyringManager
+from ethconnect import Keyring, ZymbitEthKeyring, ZymbitKeyringManager
 
 
 class ZymbitEthKeyringTest(unittest.TestCase):

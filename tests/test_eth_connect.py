@@ -16,7 +16,7 @@ class TestEthConnect(unittest.TestCase):
         use_bip39_recovery = zymkey.RecoveryStrategyBIP39()
         (master_slot, mnemonic) = zymkey.client.gen_wallet_master_seed(key_type=ZymbitEthKeyring.CURVE.get_curve_type(), master_gen_key=bytearray(), wallet_name=cls.wallet_name, recovery_strategy=use_bip39_recovery)
         cls.master_slot = master_slot
-        cls.keyring = ZymbitEthKeyring({"wallet_name": cls.wallet_name, "master_slot": master_slot})
+        cls.keyring = ZymbitEthKeyring(wallet_name=cls.wallet_name)
         cls.keyring.add_accounts(5)
 
     @classmethod

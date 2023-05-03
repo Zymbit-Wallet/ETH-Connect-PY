@@ -48,7 +48,7 @@ class ZymbitEthKeyringTest(unittest.TestCase):
         wallet_name = "test_wallet_3"
         use_bip39_recovery = zymkey.RecoveryStrategyBIP39()
         zymkey.client.gen_wallet_master_seed(key_type=ZymbitEthKeyring.CURVE.get_curve_type(), master_gen_key=bytearray(), wallet_name=wallet_name, recovery_strategy=use_bip39_recovery)
-        keyring = ZymbitEthKeyring({"wallet_name": wallet_name})
+        keyring = ZymbitEthKeyring(wallet_name=wallet_name)
         self.keyring_manager.add_keyring(keyring)
 
         # test that the keyring was added successfully

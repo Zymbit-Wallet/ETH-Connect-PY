@@ -9,12 +9,12 @@ class Keyring(ABC):
     BASE_PATH: str
     CURVE: EllipticCurve
 
-    def __init__(self, options: dict = {}) -> None:
+    def __init__(self, wallet_name: str = None, master_slot: int = None) -> None:
         if not isinstance(self.CURVE, EllipticCurve):
             raise TypeError("Invalid elliptic curve type. CURVE should be an instance of the EllipticCurve enumeration.")
         if not self._is_valid_bip44_base_path(self.BASE_PATH):
             raise TypeError("Invalid BIP44 BASE_PATH")
-        self.deserialize(options)
+        self.deserialize(wallet_name=wallet_name, master_slot=master_slot)
         if not (hasattr(self, 'wallet_name') and hasattr(self, 'master_slot')):
             raise TypeError("Subclasses of Keyring must have instance properties 'wallet_name' and 'master_slot'")
 
@@ -23,19 +23,19 @@ class Keyring(ABC):
         pass
 
     @abstractmethod
-    def deserialize(self, options: dict = {}) -> bool:
+    def deserialize(self, wallet_name: str = None, master_slot: int = None) -> bool:
         pass
 
     @abstractmethod
-    def add_account(self, index: int = 0) -> Type[Account]:
+    def add_account(self, index: int = 0) -> Account:
         pass
 
     @abstractmethod
-    def add_accounts(self, n: int = 1) -> list[Type[Account]]:
+    def add_accounts(self, n: int = 1) -> list[Account]:
         pass
 
     @abstractmethod
-    def get_accounts(self) -> list[Type[Account]]:
+    def get_accounts(self) -> list[Account]:
         pass
 
     @abstractmethod

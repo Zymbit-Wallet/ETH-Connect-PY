@@ -11,3 +11,7 @@ Ethereum accounts, signatures, and transactions have an additional layer of comp
 ```
 pip install ethconnect
 ```
+
+## Documentation:
+
+[ETH-Connect Python SDK Documentation](https://docs.zymbit.com/eth-connect/eth-connect-py/)

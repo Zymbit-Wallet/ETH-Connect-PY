@@ -5,12 +5,12 @@ import zymkey
 
 class ZymbitKeyringManager:
     
-    def __init__(self, keyrings: list[Type[Keyring]] = []) -> None:
+    def __init__(self, keyrings: list[Keyring] = []) -> None:
         if keyrings:
             for keyring in keyrings:
                 if not isinstance(keyring, Keyring):
                     raise TypeError(f"Invalid type: {type(keyring)}. Expected a subclass of the Keyring class")
-        self.keyrings: list[Type[Keyring]] = keyrings
+        self.keyrings: list[Keyring] = keyrings
 
     def create_keyring(self, keyring_class: Type[Keyring], wallet_name: str, master_gen_key: bytearray = bytearray()) -> tuple[int, str]:
         if not issubclass(keyring_class, Keyring):
@@ -29,10 +29,7 @@ class ZymbitKeyringManager:
             master_key: tuple[int, str] = zymkey.client.gen_wallet_master_seed(key_type=key_type, master_gen_key=master_gen_key, wallet_name=wallet_name, recovery_strategy=use_bip39_recovery)
             master_key_slot = master_key[0]
 
-            options = {
-                "wallet_name": wallet_name
-            }
-            keyring: keyring_class = keyring_class(options)
+            keyring: keyring_class = keyring_class(master_slot=master_key_slot)
             self.keyrings.append(keyring)
             return master_key
         except Exception as e:
@@ -41,13 +38,13 @@ class ZymbitKeyringManager:
 
             raise ValueError("Failed to create keyring")
         
-    def add_keyring(self, keyring: Type[Keyring]) -> bool:
+    def add_keyring(self, keyring: Keyring) -> bool:
         if not isinstance(keyring, Keyring):
             raise TypeError(f"Invalid type: {type(keyring)}. Expected a subclass of the Keyring class")
         self.keyrings.append(keyring)
         return True
           
-    def get_keyring(self, wallet_name: str = None, master_slot: int = None) -> Type[Keyring]:
+    def get_keyring(self, wallet_name: str = None, master_slot: int = None) -> Keyring:
         if not (wallet_name or master_slot):
             raise ValueError("wallet_name or master_slot are required")
         
@@ -57,7 +54,7 @@ class ZymbitKeyringManager:
             
         raise ValueError("Keyring does not exist in KeyringManager")
 
-    def get_keyrings(self) -> list[Type[Keyring]]:
+    def get_keyrings(self) -> list[Keyring]:
         return self.keyrings
     
     def remove_keyring(self, wallet_name: str = None, master_slot: int = None, remove_master: bool = False) -> bool:

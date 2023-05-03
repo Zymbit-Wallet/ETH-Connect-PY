@@ -14,35 +14,39 @@ class ZymbitEthKeyring(Keyring):
     BASE_PATH: str = "m/44'/60'/0'/0"
     CURVE: EllipticCurve = EllipticCurve.secp256k1
 
-    def __init__(self, options: dict = {}) -> None:
-        super().__init__(options)
+    def __init__(self, wallet_name: str = None, master_slot: int = None) -> None:
+        super().__init__(wallet_name=wallet_name, master_slot=master_slot)
 
     def serialize(self) -> dict:
         serialized_keyring = {
             "wallet_name": self.wallet_name,
             "master_slot": self.master_slot,
             "type": ZymbitEthKeyring.TYPE,
+            "curve": ZymbitEthKeyring.CURVE.get_curve_type(),
             "base_path": ZymbitEthKeyring.BASE_PATH,
             "base_slot": self.base_slot,
             "accounts": [account.serialize() for account in self.accounts]
         }
         return serialized_keyring
 
-    def deserialize(self, options: dict = {}) -> bool:
-        if "wallet_name" not in options and "master_slot" not in options:
-            raise KeyError("wallet_name and master_slot properties required in options")
+    def deserialize(self, wallet_name: str = None, master_slot: int = None) -> bool:
+        if not wallet_name and not master_slot:
+            raise ValueError("wallet_name or master_slot required")
+        
+        if wallet_name and master_slot:
+            raise ValueError("Can't provide both wallet_name and master_slot")
 
-        if "wallet_name" in options:
+        if wallet_name:
             try:
-                self.master_slot: int = zymkey.client.get_wallet_key_slot('m', options["wallet_name"])
-                self.wallet_name: str = options["wallet_name"]
+                self.master_slot: int = zymkey.client.get_wallet_key_slot('m', wallet_name)
+                self.wallet_name: str = wallet_name
             except:
                 raise ValueError("Invalid wallet_name")
         else:
             try:
-                (path, wallet_name, master_slot) = zymkey.client.get_wallet_node_addr(options["master_slot"])
+                (path, wallet_name, master_slot) = zymkey.client.get_wallet_node_addr(master_slot)
                 if path == "m":
-                    self.master_slot: int = options["master_slot"]
+                    self.master_slot: int = master_slot
                     self.wallet_name: str = wallet_name
                 else:
                     raise

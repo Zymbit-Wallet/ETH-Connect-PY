@@ -13,7 +13,7 @@ If you are a developer interested in creating your own custom implementations of
 ## Installation
 
 ```
-pip install zymbit_wallet_sdk
+pip install zymbitwalletsdk
 ```
 
 ## Documentation:

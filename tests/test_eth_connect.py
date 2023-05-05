@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import sys
 import zymkey
 import time
-from ethconnect import EthConnect, EthTransaction, SignedEthTransaction, ZymbitEthKeyring
+from zymbitwalletsdk import EthConnect, EthTransaction, SignedEthTransaction, ZymbitEthKeyring
 from Crypto.Hash import keccak, SHA256
 
 class TestEthConnect(unittest.TestCase):

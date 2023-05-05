@@ -3,8 +3,8 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "zymbit_wallet_sdk"
-version = "1.1.1"
+name = "zymbitwalletsdk"
+version = "1.0.0"
 authors = [
   { name="Shivaansh Kapoor", email="shiv@zymbit.com" },
 ]
@@ -18,4 +18,4 @@ classifiers = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/Zymbit-Wallet/ETH-Connect-PY"
+"Homepage" = "https://github.com/Zymbit-Wallet/Zymbit-Wallet-Python-SDK"

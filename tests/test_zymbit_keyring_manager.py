@@ -2,7 +2,7 @@ import unittest
 from typing import Type
 import zymkey
 import sys
-from ethconnect import Keyring, ZymbitEthKeyring, ZymbitKeyringManager
+from zymbitwalletsdk import Keyring, ZymbitEthKeyring, ZymbitKeyringManager
 
 
 class ZymbitEthKeyringTest(unittest.TestCase):

@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock
 import sys
-from ethconnect import Account, EthAccount
+from zymbitwalletsdk import Account, EthAccount
 import zymkey
 import binascii
 from web3 import Web3

@@ -3,12 +3,12 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "ethconnect"
+name = "zymbit_wallet_sdk"
 version = "1.1.1"
 authors = [
   { name="Shivaansh Kapoor", email="shiv@zymbit.com" },
 ]
-description = "ETH-Connect Python SDK"
+description = "Zymbit Wallet Python SDK"
 readme = "README.md"
 requires-python = ">=3.7"
 classifiers = [

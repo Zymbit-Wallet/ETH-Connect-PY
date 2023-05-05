@@ -4,7 +4,7 @@ from Crypto.Hash import SHA256, keccak
 from typing import List
 import sys
 import zymkey
-from ethconnect import Keyring, EthAccount, EllipticCurve, EthTransaction, SignedEthTransaction, ZymbitEthKeyring
+from zymbitwallet import Keyring, EthAccount, EllipticCurve, EthTransaction, SignedEthTransaction, ZymbitEthKeyring
 
 
 class TestZymbitEthKeyring(unittest.TestCase):

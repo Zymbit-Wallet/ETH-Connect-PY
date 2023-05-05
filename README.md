@@ -2,7 +2,7 @@
 
 ## Overview
 
-Ethereum accounts, signatures, and transactions have an additional layer of complexity over traditional cryptographic keys and signatures. The Zymbit Wallet SDK aims to abstract away this complexity, enabling you to create and manage multiple blockchain wallets and seamlessly integrate with various blockchains without having to deal with their technical intricacies. 
+Blockchain accounts, signatures, and transactions have an additional layer of complexity over traditional cryptographic keys and signatures. The Zymbit Wallet SDK aims to abstract away this complexity, enabling you to create and manage multiple blockchain wallets and seamlessly integrate with various blockchains without having to deal with their technical intricacies. 
 
 The first iteration of the SDK encapsulates all wallet creation, management, and use (sending transactions and interacting with dApps) capabilities for Ethereum and EVM compatible chains.
 

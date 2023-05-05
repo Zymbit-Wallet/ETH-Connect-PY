@@ -18,4 +18,4 @@ pip install zymbitwalletsdk
 
 ## Documentation:
 
-[Zymbit Wallet Python SDK Documentation](https://docs.zymbit.com/zymbit-wallet-sdk/zymbit-wallet-python-sdk/)
+[Zymbit Wallet Python SDK Documentation](https://docs.zymbit.com/zymbit-wallet-sdk/zymbit-wallet-sdk-py/)

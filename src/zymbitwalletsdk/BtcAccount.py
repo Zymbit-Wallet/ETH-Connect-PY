@@ -14,7 +14,7 @@ class BtcAccount(Account):
         self.address = address
         self.slot = slot
 
-        if not self._is_valid_account():
+        if not self.is_valid_account():
             raise ValueError("Must provide a valid path, address, and slot")
 
     def serialize(self) -> dict:
@@ -30,24 +30,21 @@ class BtcAccount(Account):
         public_key = zymkey.client.get_public_key(self.slot)
         return '0x' + binascii.hexlify(public_key).decode('utf-8')
 
-    @staticmethod
-    def _is_valid_account(path, address, slot) -> bool:
-        if not BtcAccount._is_valid_btc_address(address):
+    def is_valid_account(self) -> bool:
+        if not BtcAccount._is_valid_btc_address(self.address):
             return False
 
-        if slot < 16 or slot > 512:
+        if self.slot < 16 or self.slot > 512:
             return False
 
         # Determine if the address is for mainnet or testnet
-        is_testnet = address.startswith('m') or address.startswith('n') or address.startswith('2') or address.startswith('tb1')
+        is_testnet = self.address.startswith('m') or self.address.startswith('n') or self.address.startswith('2') or self.address.startswith('tb1')
 
         # Check if the path matches the address type
         if is_testnet:
-            return bool(BtcAccount.__MAINNET_PATH_PATTERN.match(path))
+            return bool(BtcAccount.__TESTNET_PATH_PATTERN.match(self.path))
         else:
-            return bool(BtcAccount.__TESTNET_PATH_PATTERN.match(path))
-
-        return False
+            return bool(BtcAccount.__MAINNET_PATH_PATTERN.match(self.path))
 
 
     @staticmethod
